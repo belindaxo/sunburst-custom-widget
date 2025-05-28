@@ -181,6 +181,11 @@ var parseMetadata = metadata => {
                         color: this.subtitleColor || "#666666",
                     },
                 },
+                plotOptions: {
+                    series: {
+                        cursor: 'pointer'
+                    }
+                },
                 tooltip: {
                     valueDecimals: 0,
                     followPointer: true,
