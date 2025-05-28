@@ -276,7 +276,7 @@ var parseMetadata = metadata => {
                                 </tr>
                             </table>
                         </div>
-                        `;
+                    `;
 
                 } else {
                     return 'error with data';
