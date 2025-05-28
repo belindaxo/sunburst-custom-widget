@@ -132,10 +132,6 @@ var parseMetadata = metadata => {
 
             const seriesData = [];
 
-            if (showAll) {
-                data = appendSuperRoot(data, labelAll);
-            }
-
             data.forEach(row => {
                 const { id, label, parentId } = row[dimension.key];
                 const { raw } = row[measure.key];
