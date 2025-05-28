@@ -1,0 +1,119 @@
+{
+    "name": "Sunburst Chart",
+    "description": "A sunburst chart with data binding support",
+    "eula": "",
+    "vendor": "",
+    "license": "",
+    "id": "com.sap.sample.sunburst",
+    "newInstancePrefix": "Sunburst",
+    "version": "0.0.1",
+    "webcomponents": [
+        {
+            "kind": "main",
+            "tag": "com-sap-sample-sunburst",
+            "url": "https://belindaxo.github.io/sunburst-custom-widget/dist/bundle.js",
+            "integrity": "",
+            "ignoreIntegrity": true
+        },
+        {
+            "kind": "styling",
+            "tag": "com-sap-sample-sunburst-aps",
+            "url": "https://belindaxo.github.io/sunburst-custom-widget/dist/bundle.js",
+            "integrity": "",
+            "ignoreIntegrity": true
+        }
+    ],
+    "properties": {
+        "width": {
+            "type": "integer",
+            "default": 600
+        },
+        "height": {
+            "type": "integer",
+            "default": 400
+        },
+        "chartTitle": {
+            "type": "string",
+            "description": "The title of the chart",
+            "default": ""
+        },
+        "titleSize": {
+            "type": "string",
+            "description": "The font size of the title text",
+            "default": "20px"
+        },
+        "titleFontStyle": {
+            "type": "string",
+            "description": "The font style of the title text",
+            "default": "bold"
+        },
+        "titleAlignment": {
+            "type": "string",
+            "description": "The alignment of the title text",
+            "default": "left"
+        },
+        "titleColor": {
+            "type": "string",
+            "description": "The color of the title text",
+            "default": "#333333"
+        },
+        "chartSubtitle": {
+            "type": "string",
+            "description": "The subtitle of the chart",
+            "default": ""
+        },
+        "subtitleSize": {
+            "type": "string",
+            "description": "The font size of the subtitle text",
+            "default": "12px"
+        },
+        "subtitleFontStyle": {
+            "type": "string",
+            "description": "The font style of the subtitle text",
+            "default": "normal"
+        },
+        "subtitleAlignment": {
+            "type": "string",
+            "description": "The alignment of the subtitle text",
+            "default": "left"
+        },
+        "subtitleColor": {
+            "type": "string",
+            "description": "The color of the subtitle text",
+            "default": "#666666"
+        },
+        "scaleFormat": {
+            "type": "string",
+            "description": "The scale of the numbers (unformatted, k, m, b)",
+            "default": "unformatted"
+        },
+        "decimalPlaces": {
+            "type": "integer",
+            "description": "The number of decimal places to display",
+            "default": 2
+        }
+    },
+    "methods": {
+
+    },
+    "events": {
+
+    },
+    "dataBindings": {
+        "dataBinding": {
+            "feeds": [
+                {
+                    "id": "dimensions",
+                    "description": "Dimensions",
+                    "type": "dimension"
+                },
+                {
+                    "id": "measures",
+                    "description": "Measures",
+                    "type": "mainStructureMember"
+                }
+            ]
+        }
+    }
+
+}
