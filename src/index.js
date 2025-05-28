@@ -149,6 +149,13 @@ var parseMetadata = metadata => {
             const scaleFormat = (value) => this._scaleFormat(value);
             const subtitleText = this._updateSubtitle();
 
+            Highcharts.setOptions({
+                lang: {
+                    thousandsSep: ','
+                },
+                colors: ['#004b8d', '#47a5dc', '#faa834', '#00aa7e', '#006ac7', '#bf8028', '#00e4a7']
+            });
+
             const chartOptions = {
                 chart: {
                     type: 'sunburst',
@@ -173,6 +180,13 @@ var parseMetadata = metadata => {
                         fontStyle: this.subtitleFontStyle || "normal",
                         color: this.subtitleColor || "#666666",
                     },
+                },
+                tooltip: {
+                    valueDecimals: 0,
+                    followPointer: true,
+                    hideDelay: 0,
+                    useHTML: true,
+                    formatter: this._formatTooltip(scaleFormat)
                 },
                 series: [{
                     type: 'sunburst',
@@ -233,6 +247,42 @@ var parseMetadata = metadata => {
             return {
                 scaledValue: scaledValue.toFixed(this.decimalPlaces),
                 valueSuffix
+            };
+        }
+
+        /**
+         * Formats the tooltip content for the chart.
+         * @param {Function} scaleFormat - A function to scale and format the value.
+         * @returns {Function} A function that formats the tooltip content.
+         */
+        _formatTooltip(scaleFormat) {
+            return function () {
+                console.log(this);
+                if (this.point) {
+                    // Retrieve the category data using the index
+                    const name = this.point.name;
+                    const { scaledValue, valueSuffix } = scaleFormat(this.y);
+                    const value = Highcharts.numberFormat(scaledValue, -1, '.', ',');
+                    const valueWithSuffix = `${value} ${valueSuffix}`;
+                    return `
+                        <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
+                            <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
+                            <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
+                            <hr style="border: none; border-top: 1px solid #eee; margin: 5px 0;">
+                            <table style="width: 100%; font-size: 14px; color: #000000;">
+                                <tr>
+                                    <td style="text-align: left; padding-right: 10px;">
+                                        <span style="color:${this.color}">\u25CF</span>
+                                    </td>
+                                    <td style="text-align: right; padding-left: 10px;">${name}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        `;
+
+                } else {
+                    return 'error with data';
+                }
             };
         }
     }
