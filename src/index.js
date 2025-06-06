@@ -170,6 +170,27 @@ var parseMetadata = metadata => {
             const seriesData = this._processSeriesData(data, dimensions, measure);
             console.log('seriesData:', seriesData);
 
+            const totalLevels = dimensions.length;
+
+            const levels = [];
+
+            // Level 1: assign color by point
+            levels.push({
+                level: 1,
+                colorByPoint: true
+            });
+
+            // Levels 2 to totalLevels: inherit and apply brightness variation
+            for (let i = 2; i <= totalLevels; i++) {
+                levels.push({
+                    level: i,
+                    colorVariation : {
+                        key: 'brightness',
+                        to: 0.5 // Adjust brightness for deeper levels
+                    }
+                })
+            }
+
             const scaleFormat = (value) => this._scaleFormat(value);
             const subtitleText = this._updateSubtitle();
 
@@ -222,10 +243,7 @@ var parseMetadata = metadata => {
                     name: measure.label || 'Value',
                     data: seriesData,
                     allowDrillToNode: true,
-                    levels: [{
-                        level: 1,
-                        colorByPoint: true
-                    }]
+                    levels: levels
                 }]
             };
             this._chart = Highcharts.chart(this.shadowRoot.getElementById('container'), chartOptions);
