@@ -177,7 +177,7 @@ var parseMetadata = metadata => {
                 lang: {
                     thousandsSep: ','
                 },
-                colors: ['#004b8d', '#47a5dc', '#faa834', '#00aa7e', '#006ac7', '#bf8028', '#00e4a7']
+                colors: ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7']
             });
 
             const chartOptions = {
@@ -221,7 +221,11 @@ var parseMetadata = metadata => {
                     type: 'sunburst',
                     name: measure.label || 'Value',
                     data: seriesData,
-                    allowDrillToNode: true
+                    allowDrillToNode: true,
+                    levels: [{
+                        level: 1,
+                        colorByPoint: true
+                    }]
                 }]
             };
             this._chart = Highcharts.chart(this.shadowRoot.getElementById('container'), chartOptions);
