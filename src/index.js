@@ -103,6 +103,43 @@ var parseMetadata = metadata => {
             }
         }
 
+        _processSeriesData(data, dimensions, measure) {
+            const seriesData = [];
+            const nodeMap = new Map();
+
+            data.forEach(row => {
+                let parentId = '';
+                let pathId = '';
+
+                dimensions.forEach((dim, level) => {
+                    const value = row[dim.key].label || `Unknown-${level}`;
+                    pathId += (pathId ? '/' : '') + value;
+
+                    if (!nodeMap.has(pathId)) {
+                        nodeMap.set(pathId, true);
+                        const node = {
+                            id: pathId,
+                            parent: level === 0 ? '' : parentId,
+                            name: value
+                        };
+
+                        // Assign value only on the leaf level
+                        if (level === dimensions.length - 1) {
+                            node.value = row[measure.key].raw ?? 0; // Default to 0 if raw value is undefined
+                        }
+
+                        seriesData.push(node);
+                    }
+
+                    parentId = pathId; // Update parentId for the next level
+                });
+            });
+
+            return seriesData;
+        }
+
+
+
         /**
          * Renders the chart using the provided data and metadata.
          */
@@ -130,20 +167,7 @@ var parseMetadata = metadata => {
             const [dimension] = dimensions;
             const [measure] = measures;
 
-            const seriesData = [];
-
-            data.forEach(row => {
-                const { id, label, parentId } = row[dimension.key];
-                const { raw } = row[measure.key];
-
-                seriesData.push({ 
-                    id: id,
-                    parent: parentId || '',
-                    name: label,
-                    value: raw
-                });
-            });
-
+            const seriesData = this._processSeriesData(data, dimensions, measure);
             console.log('seriesData:', seriesData);
 
             const scaleFormat = (value) => this._scaleFormat(value);
