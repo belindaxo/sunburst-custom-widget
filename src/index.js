@@ -198,7 +198,7 @@ var parseMetadata = metadata => {
                 lang: {
                     thousandsSep: ','
                 },
-                colors: ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7']
+                colors: ['#004b8d', '#939598', '#00aa7e', '#faa834', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7']
             });
 
             const chartOptions = {
@@ -225,6 +225,9 @@ var parseMetadata = metadata => {
                         fontStyle: this.subtitleFontStyle || "normal",
                         color: this.subtitleColor || "#666666",
                     },
+                },
+                credits: {
+                    enabled: false
                 },
                 plotOptions: {
                     series: {
