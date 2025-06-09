@@ -109,7 +109,6 @@ var parseMetadata = metadata => {
         _processSeriesData(data, dimensions, measure) {
             const seriesData = [];
             const nodeMap = new Map();
-            const customColors = this.customColors || [];
 
             data.forEach(row => {
                 let parentId = '';
@@ -126,13 +125,6 @@ var parseMetadata = metadata => {
                             parent: level === 0 ? '' : parentId,
                             name: value
                         };
-
-                        if (level === 0) {
-                            const colorEntry = customColors.find(c => c.category === value);
-                            if (colorEntry && colorEntry.color) {
-                                node.color = colorEntry.color;
-                            }
-                        }
 
                         // Assign value only on the leaf level
                         if (level === dimensions.length - 1) {
@@ -187,7 +179,8 @@ var parseMetadata = metadata => {
 
             // Level 1
             levels.push({
-                level: 1
+                level: 1,
+                colorByPoint: true
             });
 
             // Levels 2 to totalLevels: inherit and apply brightness variation
@@ -204,6 +197,7 @@ var parseMetadata = metadata => {
             const topDimensionKey = dimensions[0].key;
 
             const uniqueTopMembers = [...new Set(data.map(row => row[topDimensionKey].label || 'Unknown'))];
+            console.log('uniqueTopMembers:', uniqueTopMembers);
 
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(uniqueTopMembers)) {
                 this._lastSentCategories = uniqueTopMembers;
@@ -215,6 +209,17 @@ var parseMetadata = metadata => {
                     }
                 }));
             }
+
+            const customColors = this.customColors || [];
+
+            seriesData.forEach(node => {
+                if (node.parent === '') {
+                    const colorEntry = customColors.find(c => c.category === node.name);
+                    if (colorEntry.color) {
+                        node.color = colorEntry.color;
+                    }
+                }
+            });
 
             
 
