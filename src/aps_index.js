@@ -1,4 +1,5 @@
-const defaultColors = ['#004b8d', '#faa834', '#47a5dc', '#00aa7e', '#006ac7', '#ccced2', '#bf8028', '#00e4a7', '#939598'];
+const defaultColors = ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7'];
+
 (function () {
     /**
      * Template for the Styling Panel (APS) of the Funnel3D widget.
@@ -229,6 +230,14 @@ const defaultColors = ['#004b8d', '#faa834', '#47a5dc', '#00aa7e', '#006ac7', '#
                     colorGridContainer.appendChild(wrapper);
                 });
             };
+
+            const resetColorsButton = this._shadowRoot.getElementById('resetColors');
+            resetColorsButton.addEventListener('click', () => {
+                this.customColors = []; // Clear the array
+                renderCategoryColorGrid(); // Update the UI
+                this._submit(new Event('submit')); // Push to SAC to re-render chart
+                console.log("Custom colors reset.");
+            });
 
             this._shadowRoot.getElementById('form').addEventListener('submit', this._submit.bind(this));
             this._shadowRoot.getElementById('titleSize').addEventListener('change', this._submit.bind(this));

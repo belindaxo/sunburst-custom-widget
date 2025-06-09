@@ -226,7 +226,7 @@ var parseMetadata = metadata => {
                 lang: {
                     thousandsSep: ','
                 },
-                colors: ['#004b8d', '#faa834', '#47a5dc', '#00aa7e', '#006ac7', '#ccced2', '#bf8028', '#00e4a7', '#939598']
+                colors: ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7']
             });
 
             const chartOptions = {
