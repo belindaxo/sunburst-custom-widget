@@ -366,6 +366,7 @@ var parseMetadata = metadata => {
                 if (this.point) {
                     // Retrieve the category data using the index
                     const name = this.point.name;
+                    const description = this.point.description || 'Description';
                     const { scaledValue, valueSuffix } = scaleFormat(this.point.value);
                     const value = Highcharts.numberFormat(scaledValue, -1, '.', ',');
                     const valueWithSuffix = `${value} ${valueSuffix}`;
@@ -376,6 +377,7 @@ var parseMetadata = metadata => {
                             <hr style="border: none; border-top: 1px solid #eee; margin: 5px 0;">
                             <table style="width: 100%; font-size: 14px; color: #000000;">
                                 <tr>
+                                    <td style="text-align: left; padding-right: 10px;">${description}</td>
                                     <td style="text-align: right; padding-left: 10px;">${name}</td>
                                 </tr>
                             </table>
