@@ -174,11 +174,23 @@ var parseMetadata = metadata => {
             const seriesData = this._processSeriesData(data, dimensions, measure);
             console.log('seriesData:', seriesData);
 
+            const seriesName = measures[0]?.label || 'Value';
+
+            const dimDescriptions = dimensions.map(dim => {
+                const dimDescription = dim.description || 'Dimension Description';
+                return dimDescription;
+            });
+            console.log('dimDescriptions:', dimDescriptions);
+
+            const dimPart = dimDescriptions.join(', ');
+            console.log('dimPart:', dimPart);
+
+            const autoTitle = `${seriesName} by ${dimPart}`;
+            console.log('autoTitle:', autoTitle);
+
             const totalLevels = dimensions.length;
 
             const levels = [];
-
-            
 
             // Level 1
             levels.push({
@@ -196,14 +208,6 @@ var parseMetadata = metadata => {
                     }
                 })
             }
-
-            const topDimensionKey = dimensions[0].key;
-
-            const uniqueTopMembers = seriesData
-                .filter(node => node.parent === '')
-                .map(node => node.name);
-
-            console.log('uniqueTopMembers:', uniqueTopMembers);
 
             const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
