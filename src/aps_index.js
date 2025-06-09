@@ -138,6 +138,9 @@
                 </td>
             </tr>
         </table>
+        <tr>
+            <button id="resetDefaults" type="button" style="margin-top: 10px; margin-bottom: 10px;">Reset to Default</button>
+        </tr>
         <input type="submit" style="display:none;">
         </form>
     `;
@@ -178,6 +181,25 @@
             this._shadowRoot.getElementById('subtitleColor').addEventListener('change', this._submit.bind(this));
             this._shadowRoot.getElementById('scaleFormat').addEventListener('change', this._submit.bind(this));
             this._shadowRoot.getElementById('decimalPlaces').addEventListener('change', this._submit.bind(this));
+
+            // Reset button logic
+            this._shadowRoot.getElementById('resetDefaults').addEventListener('click', () => {
+                for (const key in DEFAULTS) {
+                    if (key === 'chartTitle' || key === 'chartSubtitle') {
+                        continue; // Skip these fields
+                    }
+
+                    const element = this._shadowRoot.getElementById(key);
+                    if (!element) continue; // Skip if element not found
+
+                    if (typeof DEFAULTS[key] === 'boolean') {
+                        element.checked = DEFAULTS[key];
+                    } else {
+                        element.value = DEFAULTS[key];
+                    }
+                }
+                this._submit(new Event('submit')); // Trigger submit event to update properties
+            });
         }
 
         /**
