@@ -123,7 +123,8 @@ var parseMetadata = metadata => {
                         const node = {
                             id: pathId,
                             parent: level === 0 ? '' : parentId,
-                            name: value
+                            name: value,
+                            description: row[dim.key].description || '',
                         };
 
                         // Assign value only on the leaf level
@@ -176,6 +177,8 @@ var parseMetadata = metadata => {
             const totalLevels = dimensions.length;
 
             const levels = [];
+
+            
 
             // Level 1
             levels.push({
