@@ -202,12 +202,13 @@ var parseMetadata = metadata => {
 
             console.log('uniqueTopMembers:', uniqueTopMembers);
 
-            if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(uniqueTopMembers)) {
-                this._lastSentCategories = uniqueTopMembers;
+            const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
+            if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
+                this._lastSentCategories = validCategoryNames;
                 this.dispatchEvent(new CustomEvent('propertiesChanged', {
                     detail: {
                         properties: {
-                            validCategoryNames: uniqueTopMembers
+                            validCategoryNames
                         }
                     }
                 }));
