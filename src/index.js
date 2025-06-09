@@ -124,7 +124,7 @@ var parseMetadata = metadata => {
                             id: pathId,
                             parent: level === 0 ? '' : parentId,
                             name: value,
-                            description: row[dim.key].description || '',
+                            description: dim.description || '',
                         };
 
                         // Assign value only on the leaf level
