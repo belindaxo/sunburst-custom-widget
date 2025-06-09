@@ -179,8 +179,7 @@ var parseMetadata = metadata => {
 
             // Level 1
             levels.push({
-                level: 1,
-                colorByPoint: true
+                level: 1
             });
 
             // Levels 2 to totalLevels: inherit and apply brightness variation
