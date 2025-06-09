@@ -215,7 +215,7 @@ var parseMetadata = metadata => {
             seriesData.forEach(node => {
                 if (node.parent === '') {
                     const colorEntry = customColors.find(c => c.category === node.name);
-                    if (colorEntry.color) {
+                    if (colorEntry && colorEntry.color) {
                         node.color = colorEntry.color;
                     }
                 }
