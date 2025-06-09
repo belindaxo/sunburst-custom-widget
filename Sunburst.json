@@ -40,7 +40,7 @@
         "titleSize": {
             "type": "string",
             "description": "The font size of the title text",
-            "default": "20px"
+            "default": "16px"
         },
         "titleFontStyle": {
             "type": "string",
@@ -55,7 +55,7 @@
         "titleColor": {
             "type": "string",
             "description": "The color of the title text",
-            "default": "#333333"
+            "default": "#004B8D"
         },
         "chartSubtitle": {
             "type": "string",
@@ -65,7 +65,7 @@
         "subtitleSize": {
             "type": "string",
             "description": "The font size of the subtitle text",
-            "default": "12px"
+            "default": "11px"
         },
         "subtitleFontStyle": {
             "type": "string",
@@ -80,7 +80,7 @@
         "subtitleColor": {
             "type": "string",
             "description": "The color of the subtitle text",
-            "default": "#666666"
+            "default": "#000000"
         },
         "scaleFormat": {
             "type": "string",

@@ -27,8 +27,8 @@
                                 <option value="10px">10</option>
                                 <option value="12px">12</option>
                                 <option value="14px">14</option>
-                                <option value="16px">16</option>
-                                <option value="18px" selected>18</option>
+                                <option value="16px" selected>16</option>
+                                <option value="18px">18</option>
                                 <option value="20px">20</option>
                                 <option value="22px">22</option>
                                 <option value="24px">24</option>
@@ -50,7 +50,7 @@
                             </select>
                         </td>
                         <td>
-                            <input id="titleColor" type="color" value="#333333">
+                            <input id="titleColor" type="color" value="#004B8D">
                         </td>
                     </tr>
                 </table>
@@ -75,7 +75,8 @@
                         <td>
                             <select id="subtitleSize">
                                 <option value="10px">10</option>
-                                <option value="12px" selected>12</option>
+                                <option value="11px" selected>11</option>
+                                <option value="12px">12</option>
                                 <option value="14px">14</option>
                                 <option value="16px">16</option>
                                 <option value="18px">18</option>
@@ -100,7 +101,7 @@
                             </select>
                         </td>
                         <td>
-                            <input id="subtitleColor" type="color" value="#666666">
+                            <input id="subtitleColor" type="color" value="#000000">
                         </td>
                     </tr>
                 </table>
@@ -148,6 +149,22 @@
     class SunburstAps extends HTMLElement {
         constructor() {
             super();
+
+            const DEFAULTS = {
+                chartTitle: '',
+                titleSize: '16px',
+                titleFontStyle: 'bold',
+                titleAlignment: 'left',
+                titleColor: '#004B8D',
+                chartSubtitle: '',
+                subtitleSize: '11px',
+                subtitleFontStyle: 'normal',
+                subtitleAlignment: 'left',
+                subtitleColor: '#000000',
+                scaleFormat: 'unformatted',
+                decimalPlaces: '2'
+            }
+
             this._shadowRoot = this.attachShadow({ mode: 'open' });
             this._shadowRoot.appendChild(template.content.cloneNode(true));
             this._shadowRoot.getElementById('form').addEventListener('submit', this._submit.bind(this));
