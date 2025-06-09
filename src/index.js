@@ -203,6 +203,7 @@ var parseMetadata = metadata => {
             console.log('uniqueTopMembers:', uniqueTopMembers);
 
             const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
+            console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
                 this._lastSentCategories = validCategoryNames;
                 this.dispatchEvent(new CustomEvent('propertiesChanged', {
@@ -214,28 +215,32 @@ var parseMetadata = metadata => {
                 }));
             }
 
-            const customColors = this.customColors || [];
-
-            seriesData.forEach(node => {
-                if (node.parent === '') {
-                    const colorEntry = customColors.find(c => c.category === node.name);
-                    if (colorEntry && colorEntry.color) {
-                        node.color = colorEntry.color;
-                    }
-                }
-            });
-
-            console.log('seriesData with colors:', seriesData);
-
             const scaleFormat = (value) => this._scaleFormat(value);
             const subtitleText = this._updateSubtitle();
 
             Highcharts.setOptions({
                 lang: {
                     thousandsSep: ','
-                },
-                colors: ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7']
+                }
             });
+
+            const defaultColors = ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7'];
+            const customColors = this.customColors || [];
+            
+            seriesData.forEach(node => {
+                if (node.parent === '') {
+                    const colorEntry = customColors.find(c => c.category === node.name);
+                    if (colorEntry && colorEntry.color) {
+                        node.color = colorEntry.color;
+                    } else {
+                        // Use default color if no custom color is found
+                        const index = validCategoryNames.indexOf(node.name);
+                        node.color = defaultColors[index % defaultColors.length];
+                    }
+                }
+            });
+
+            console.log('seriesData with colors:', seriesData);
 
             const chartOptions = {
                 chart: {
