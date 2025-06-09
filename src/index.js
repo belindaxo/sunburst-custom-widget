@@ -231,7 +231,13 @@ var parseMetadata = metadata => {
                 },
                 plotOptions: {
                     series: {
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            style: {
+                                fontWeight: 'normal'
+                            }
+                        }
                     }
                 },
                 tooltip: {
