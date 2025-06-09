@@ -179,14 +179,15 @@ var parseMetadata = metadata => {
 
             // Level 1
             levels.push({
-                level: 1
+                level: 1,
+                colorByPoint: true
             });
 
             // Levels 2 to totalLevels: inherit and apply brightness variation
             for (let i = 2; i <= totalLevels; i++) {
                 levels.push({
                     level: i,
-                    colorVariation : {
+                    colorVariation: {
                         key: 'brightness',
                         to: 0.5 // Adjust brightness for deeper levels
                     }
@@ -195,7 +196,10 @@ var parseMetadata = metadata => {
 
             const topDimensionKey = dimensions[0].key;
 
-            const uniqueTopMembers = [...new Set(data.map(row => row[topDimensionKey].label || 'Unknown'))];
+            const uniqueTopMembers = seriesData
+                .filter(node => node.parent === '')
+                .map(node => node.name);
+
             console.log('uniqueTopMembers:', uniqueTopMembers);
 
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(uniqueTopMembers)) {
@@ -220,7 +224,7 @@ var parseMetadata = metadata => {
                 }
             });
 
-            
+            console.log('seriesData with colors:', seriesData);
 
             const scaleFormat = (value) => this._scaleFormat(value);
             const subtitleText = this._updateSubtitle();
