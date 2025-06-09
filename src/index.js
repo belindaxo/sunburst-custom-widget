@@ -239,7 +239,7 @@ var parseMetadata = metadata => {
 
             const defaultColors = ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7'];
             const customColors = this.customColors || [];
-            
+
             seriesData.forEach(node => {
                 if (node.parent === '') {
                     const colorEntry = customColors.find(c => c.category === node.name);
@@ -260,6 +260,46 @@ var parseMetadata = metadata => {
                     type: 'sunburst',
                     style: {
                         fontFamily: "'72', sans-serif"
+                    },
+                    events: {
+                        drillup: (e) => {
+                            const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
+
+                            const targetId = e.to?.id || ''; // empty string = root
+
+                            if (!targetId) {
+                                // Drill-up to root, clear all filters
+                                linkedAnalysis.removeFilters();
+                                this._selectedPoint = null;
+                                this._drillPath = '';
+                                console.log('Drilled up to root, cleared all filters.');
+                            } else {
+                                const labels = targetId.split('/');
+                                const { data, metadata } = this.dataBinding;
+                                const { dimensions } = parseMetadata(metadata);
+
+                                const selectedItem = data.find(row =>
+                                    labels.every((label, i) => row[dimensions[i]?.key]?.label === label)
+                                );
+
+                                if (selectedItem) {
+                                    const filter = {};
+                                    labels.forEach((label, i) => {
+                                        const dim = dimensions[i];
+                                        if (dim) {
+                                            filter[dim.id] = selectedItem[dim.key]?.id;
+                                        }
+                                    });
+                                    linkedAnalysis.setFilters(filter);
+                                    this._drillPath = targetId;
+                                    console.log('Drilled up to:', targetId, 'with filters:', filter);
+                                } else {
+                                    console.log('No matching item found for drill-up path:', targetId);
+                                }
+
+                                this._selectedPoint = null; // Reset selected point on drill-up
+                            }
+                        }
                     }
                 },
                 title: {
@@ -431,10 +471,12 @@ var parseMetadata = metadata => {
             const path = point.id;
             const level = path.split('/').length - 1;
             const labels = path.split('/');
+            this._drillPath = path; // Store the drill path for later use
 
             console.log('Path:', path);
             console.log('Level:', level);
             console.log('Labels:', labels);
+            console.log('_drillPath:', this._drillPath);
 
             const dimension = dimensions[level];
             if (!dimension) {
