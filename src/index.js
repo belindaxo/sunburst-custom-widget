@@ -51,6 +51,7 @@ var parseMetadata = metadata => {
             `;
 
             this._lastSentCategories = [];
+            this._selectedPoint = null;
         }
 
         /**
@@ -78,6 +79,7 @@ var parseMetadata = metadata => {
                 this._chart.destroy();
                 this._chart = null;
             }
+            this._selectedPoint = null;
         }
 
         /**
@@ -153,6 +155,7 @@ var parseMetadata = metadata => {
                 if (this._chart) {
                     this._chart.destroy();
                     this._chart = null;
+                    this._selectedPoint = null;
                 }
                 return;
             }
@@ -164,6 +167,7 @@ var parseMetadata = metadata => {
                 if (this._chart) {
                     this._chart.destroy();
                     this._chart = null;
+                    this._selectedPoint = null;
                 }
                 return;
             }
@@ -222,6 +226,7 @@ var parseMetadata = metadata => {
                 }));
             }
 
+            const handlePointClick = (event) => this._handlePointClick(event, dataBinding, dimensions);
             const scaleFormat = (value) => this._scaleFormat(value);
             const subtitleText = this._updateSubtitle();
             const titleText = this._updateTitle(autoTitle);
@@ -281,6 +286,13 @@ var parseMetadata = metadata => {
                 plotOptions: {
                     series: {
                         cursor: 'pointer',
+                        allowPointSelect: true,
+                        point: {
+                            events: {
+                                select: handlePointClick,
+                                unselect: handlePointClick
+                            },
+                        },
                         dataLabels: {
                             enabled: true,
                             style: {
@@ -406,6 +418,56 @@ var parseMetadata = metadata => {
                     return 'error with data';
                 }
             };
+        }
+
+        _handlePointClick(event, dataBinding, dimensions) {
+            const point = event.target;
+            if (!point) {
+                return;
+            }
+            console.log('Point clicked:', point);
+
+            const name = point.name;
+            const path = point.id;
+            const level = path.split('/').length - 1;
+
+            console.log('Path:', path);
+            console.log('Level:', level);
+
+            const dimension = dimensions[level];
+            if (!dimension) {
+                console.log('No dimension found for level:', level);
+                return;
+            }
+
+            const dimensionKey = dimension.key;
+            console.log('Dimension Key:', dimensionKey);
+            const dimensionId = dimension.id;
+            console.log('Dimension ID:', dimensionId);
+            const label = name;
+
+            const selectedItem = dataBinding.data.find((item) => item[dimensionKey]?.label === label);
+
+            const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
+
+            // Deselect previously selected point
+            if (this._selectedPoint && this._selectedPoint !== point) {
+                linkedAnalysis.removeFilters();
+                this._selectedPoint.select(false, false);
+                this._selectedPoint = null;
+            }
+
+            if (event.type === 'select') {
+                if (selectedItem) {
+                    const selection = {};
+                    selection[dimensionId] = selectedItem[dimensionKey]?.id;
+                    linkedAnalysis.setFilters(selection);
+                    this._selectedPoint = point;
+                }
+            } else if (event.type === 'unselect') {
+                linkedAnalysis.removeFilters();
+                this._selectedPoint = null;
+            }
         }
     }
     customElements.define('com-sap-sample-sunburst', Sunburst);

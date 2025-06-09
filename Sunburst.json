@@ -7,6 +7,7 @@
     "id": "com.sap.sample.sunburst",
     "newInstancePrefix": "Sunburst",
     "version": "0.0.1",
+    "supportsLinkedAnalysisFilterOnSelection": true,
     "webcomponents": [
         {
             "kind": "main",
