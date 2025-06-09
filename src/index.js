@@ -185,7 +185,7 @@ var parseMetadata = metadata => {
             const dimPart = dimDescriptions.join(', ');
             console.log('dimPart:', dimPart);
 
-            const autoTitle = `${seriesName} by ${dimPart}`;
+            const autoTitle = `${seriesName} per ${dimPart}`;
             console.log('autoTitle:', autoTitle);
 
             const totalLevels = dimensions.length;
