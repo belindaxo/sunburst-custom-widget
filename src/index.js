@@ -49,6 +49,8 @@ var parseMetadata = metadata => {
             this.shadowRoot.innerHTML = `
                 <div id="container"></div>    
             `;
+
+            this._lastSentCategories = [];
         }
 
         /**
@@ -86,7 +88,8 @@ var parseMetadata = metadata => {
             return [
                 'chartTitle', 'titleSize', 'titleFontStyle', 'titleAlignment', 'titleColor',                // Title properties
                 'chartSubtitle', 'subtitleSize', 'subtitleFontStyle', 'subtitleAlignment', 'subtitleColor', // Subtitle properties
-                'scaleFormat', 'decimalPlaces'                                                              // Number formatting properties
+                'scaleFormat', 'decimalPlaces',                                                             // Number formatting properties
+                'customColors'
             ];
         }
 
@@ -106,6 +109,7 @@ var parseMetadata = metadata => {
         _processSeriesData(data, dimensions, measure) {
             const seriesData = [];
             const nodeMap = new Map();
+            const customColors = this.customColors || [];
 
             data.forEach(row => {
                 let parentId = '';
@@ -122,6 +126,13 @@ var parseMetadata = metadata => {
                             parent: level === 0 ? '' : parentId,
                             name: value
                         };
+
+                        if (level === 0) {
+                            const colorEntry = customColors.find(c => c.category === value);
+                            if (colorEntry && colorEntry.color) {
+                                node.color = colorEntry.color;
+                            }
+                        }
 
                         // Assign value only on the leaf level
                         if (level === dimensions.length - 1) {
@@ -190,6 +201,23 @@ var parseMetadata = metadata => {
                     }
                 })
             }
+
+            const topDimensionKey = dimensions[0].key;
+
+            const uniqueTopMembers = [...new Set(data.map(row => row[topDimensionKey].label || 'Unknown'))];
+
+            if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(uniqueTopMembers)) {
+                this._lastSentCategories = uniqueTopMembers;
+                this.dispatchEvent(new CustomEvent('propertiesChanged', {
+                    detail: {
+                        properties: {
+                            validCategoryNames: uniqueTopMembers
+                        }
+                    }
+                }));
+            }
+
+            
 
             const scaleFormat = (value) => this._scaleFormat(value);
             const subtitleText = this._updateSubtitle();

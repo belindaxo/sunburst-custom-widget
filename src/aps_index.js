@@ -141,6 +141,13 @@
         <tr>
             <button id="resetDefaults" type="button" style="margin-top: 10px; margin-bottom: 10px;">Reset to Default</button>
         </tr>
+        <legend style="font-weight: bold;font-size: 18px;">Color Settings</legend>
+        <table>
+            <div id="categoryColorGrid" style="margin-top: 8px;"></div>
+            <tr>
+                <td><button type="button" id="resetColors">Reset Colors</button></td>
+            </tr>
+        </table>
         <input type="submit" style="display:none;">
         </form>
     `;
@@ -170,6 +177,58 @@
 
             this._shadowRoot = this.attachShadow({ mode: 'open' });
             this._shadowRoot.appendChild(template.content.cloneNode(true));
+
+            // Initialize internal state
+            this.customColors = [];
+
+            // Dynamic list container for category color controls
+            const colorGridContainer = this._shadowRoot.getElementById('categoryColorGrid');
+
+            // Function to render category-based color pickers
+            const renderCategoryColorGrid = () => {
+                colorGridContainer.innerHTML = '';
+                this.validCategoryNames.forEach(categoryName => {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.display = 'flex';
+                    wrapper.style.alignItems = 'center';
+                    wrapper.style.marginBottom = '6px';
+
+                    const label = document.createElement('span');
+                    label.textContent = categoryName;
+                    label.style.width = '140px';
+
+                    const input = document.createElement('input');
+                    input.type = 'color';
+                    input.style.marginLeft = '8px';
+
+                    const currentColor = this.customColors.find(c => c.category === categoryName)?.color;
+                    const defaultIndex = this.validCategoryNames.indexOf(categoryName) % defaultColors.length;
+                    input.value = currentColor || defaultColors[defaultIndex];
+
+                    input.addEventListener('change', () => {
+                        const existing = this.customColors.find(c => c.category === categoryName);
+                        const updatedColor = input.value;
+
+                        if (existing) {
+                            if (updatedColor === defaultColors[defaultIndex]) {
+                                this.customColors = this.customColors.filter(c => c.category !== categoryName);
+                            } else {
+                                existing.color = updatedColor;
+                                this.customColors = [...this.customColors]; // force reactivity
+                            }
+                        } else if (updatedColor !== defaultColors[defaultIndex]) {
+                            this.customColors = [...this.customColors, { category: categoryName, color: updatedColor }];
+                        }
+
+                        this._submit(new Event('submit'));
+                    });
+
+                    wrapper.appendChild(label);
+                    wrapper.appendChild(input);
+                    colorGridContainer.appendChild(wrapper);
+                });
+            };
+
             this._shadowRoot.getElementById('form').addEventListener('submit', this._submit.bind(this));
             this._shadowRoot.getElementById('titleSize').addEventListener('change', this._submit.bind(this));
             this._shadowRoot.getElementById('titleFontStyle').addEventListener('change', this._submit.bind(this));
@@ -200,6 +259,9 @@
                 }
                 this._submit(new Event('submit')); // Trigger submit event to update properties
             });
+
+            this._renderCategoryColorGrid = renderCategoryColorGrid; // Store the function for later use
+            renderCategoryColorGrid(); // Initial render of the category color grid
         }
 
         /**
@@ -222,7 +284,9 @@
                         subtitleAlignment: this.subtitleAlignment,
                         subtitleColor: this.subtitleColor,
                         scaleFormat: this.scaleFormat,
-                        decimalPlaces: this.decimalPlaces
+                        decimalPlaces: this.decimalPlaces,
+                        customColors: this.customColors,
+                        validCategoryNames: this.validCategoryNames
                     }
                 }
             }));
@@ -326,6 +390,28 @@
 
         set decimalPlaces(value) {
             this._shadowRoot.getElementById('decimalPlaces').value = value;
+        }
+
+        get customColors() {
+            return this._customColors || [];
+        }
+
+        set customColors(value) {
+            this._customColors = value || [];
+            if (this._renderCategoryColorGrid && this._validCategoryNames) {
+                this._renderCategoryColorGrid(); // rebuild UI on update
+            }
+        }
+
+        get validCategoryNames() {
+            return this._validCategoryNames || [];
+        }
+
+        set validCategoryNames(value) {
+            this._validCategoryNames = value || [];
+            if (this._renderCategoryColorGrid && this._customColors) {
+                this._renderCategoryColorGrid(); // rebuild UI on update
+            }
         }
     }
     customElements.define('com-sap-sample-sunburst-aps', SunburstAps);

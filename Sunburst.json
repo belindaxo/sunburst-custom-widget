@@ -91,6 +91,16 @@
             "type": "integer",
             "description": "The number of decimal places to display",
             "default": 2
+        },
+        "customColors": {
+            "type": "CustomColor[]",
+            "description": "List of category-color mappings",
+            "default": []
+        },
+        "validCategoryNames": {
+            "type": "string[]",
+            "description": "List of valid dimension labels to allow category color selection",
+            "default": []
         }
     },
     "methods": {
@@ -98,6 +108,21 @@
     },
     "events": {
 
+    },
+    "types": {
+        "CustomColor": {
+            "description": "Represents a custom color in the customColors array.",
+            "properties": [
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "color",
+                    "type": "string"
+                }
+            ]
+        }
     },
     "dataBindings": {
         "dataBinding": {
