@@ -430,9 +430,11 @@ var parseMetadata = metadata => {
             const name = point.name;
             const path = point.id;
             const level = path.split('/').length - 1;
+            const labels = path.split('/');
 
             console.log('Path:', path);
             console.log('Level:', level);
+            console.log('Labels:', labels);
 
             const dimension = dimensions[level];
             if (!dimension) {
@@ -460,7 +462,16 @@ var parseMetadata = metadata => {
             if (event.type === 'select') {
                 if (selectedItem) {
                     const selection = {};
-                    selection[dimensionId] = selectedItem[dimensionKey]?.id;
+                    // selection[dimensionId] = selectedItem[dimensionKey]?.id;
+                    // linkedAnalysis.setFilters(selection);
+                    // this._selectedPoint = point;
+                    labels.forEach((label, index) => {
+                        const dim = dimensions[index];
+                        if (dim && selectedItem[dim.key]) {
+                            selection[dim.id] = selectedItem[dim.key].id;
+                        }
+                    });
+
                     linkedAnalysis.setFilters(selection);
                     this._selectedPoint = point;
                 }
