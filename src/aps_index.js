@@ -1,3 +1,4 @@
+const defaultColors = ['#004b8d', '#faa834', '#47a5dc', '#00aa7e', '#006ac7', '#ccced2', '#bf8028', '#00e4a7', '#939598'];
 (function () {
     /**
      * Template for the Styling Panel (APS) of the Funnel3D widget.
