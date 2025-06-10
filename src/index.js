@@ -215,6 +215,8 @@ var parseMetadata = metadata => {
                 })
             }
 
+            console.log('levels:', levels);
+
             const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
