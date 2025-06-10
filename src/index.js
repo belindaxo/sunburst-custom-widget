@@ -339,6 +339,7 @@ var parseMetadata = metadata => {
                     breadcrumbs: {
                         events: {
                             click: (event) => {
+                                console.log('this: ', this);
                                 console.log('Breadcrumb clicked:', event);
                                 const chart = this._chart;
                                 const rootId = chart.series[0].rootNode;
