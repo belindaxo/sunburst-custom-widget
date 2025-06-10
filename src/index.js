@@ -385,19 +385,16 @@ var parseMetadata = metadata => {
                             click: function (button, breadcrumbs) {
                                 console.log('Breadcrumbs button:', button);
                                 console.log('Breadcrumbs object class:', breadcrumbs);
-                                // const chart = breadcrumbs.chart;
-                                // const series = chart.series[0];
-                                // const rootId = button.newRoot;
-                                // const rootNode = series.nodeMap[rootId];
-                                // const rootLevel = rootNode?.level ?? 0;
-
-                                // console.log('New root level:', rootLevel);
-
-                                // const newLevels = this._generateLevels(rootLevel, totalLevels);
-                                // series.update({
-                                //     levels: newLevels
-                                // });
-                            }//.bind(this)
+                                const chart = breadcrumbs.levelOptions.series.chart;
+                                const series = chart.series[0];
+                                const newLevel = button.newLevel;
+                                const rootLevel = newLevel ?? 0;
+                                console.log('New root level:', rootLevel);
+                                const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                series.update({
+                                    levels: newLevels
+                                });
+                            }.bind(this)
                         }
                     }
                 }]
@@ -420,7 +417,7 @@ var parseMetadata = metadata => {
                         },
                     },
                     true
-                ); // true = redraw
+                ); 
             });
 
             container.addEventListener("mouseleave", () => {
