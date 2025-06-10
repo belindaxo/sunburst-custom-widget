@@ -362,7 +362,7 @@ var parseMetadata = metadata => {
                         point: {
                             events: {
                                 select: (event) => {
-                                    handlePointClick;
+                                    handlePointClick(event);
 
                                     const node = event.target;
                                     const depth = node.id.split('/').length;
