@@ -196,40 +196,30 @@ var parseMetadata = metadata => {
 
             const totalLevels = dimensions.length;
 
-            const levels = [];
+            const levels = this._generateLevels(0, totalLevels);
 
-            // Level 1
-            levels.push({
-                level: 1,
-                colorByPoint: true
-            });
+            // for (let i = 1; i < totalLevels; i++) {
+            //     const levelConfig = {
+            //         level: i,
+            //         levelSize: {
+            //             value: i <= 2 ? 1 : 0
+            //         },
+            //         dataLabels: {
+            //             enabled: i <= 2
+            //         }
+            //     };
 
-            // Level 2
-            levels.push({
-                level: 2,
-                colorVariation: {
-                    key: 'brightness',
-                    to: 0.5 // Adjust brightness for deeper levels
-                }
-            });
+            //     if (i === 1) {
+            //         levelConfig.colorByPoint = true; // Color by point for the first level
+            //     } else {
+            //         levelConfig.colorVariation = {
+            //             key: 'brightness',
+            //             to: 0.5
+            //         };
+            //     }
 
-            // Levels 3 to totalLevels: inherit and apply brightness variation
-            for (let i = 3; i <= totalLevels; i++) {
-                levels.push({
-                    level: i,
-                    colorVariation: {
-                        key: 'brightness',
-                        to: 0.5 // Adjust brightness for deeper levels
-                    },
-                    hidden: true,
-                    dataLabels: {
-                        enabled: false
-                    },
-                    levelSize: {
-                        value: 0
-                    }
-                });
-            }
+            //     levels.push(levelConfig);
+            // }
 
             console.log('levels:', levels);
 
@@ -323,23 +313,6 @@ var parseMetadata = metadata => {
                     style: {
                         fontFamily: "'72', sans-serif"
                     },
-                    events: {
-                        drilldown: (e) => {
-                            console.log("Drilldown event:", e);
-                            if (e.point && e.point.node) {
-                                const level = e.point.node.level;
-                                if (level === 1) {
-                                    // Show level 3
-                                    this._triggerLevel(3, this._chart, true);
-                                }
-                            }
-                        },
-                        drillup: (e) => {
-                            console.log("Drillup event:", e);
-                            // Hide level 3 when drilling up
-                            this._triggerLevel(3, this._chart, false);
-                        }
-                    }
                 },
                 title: {
                     text: titleText,
@@ -393,7 +366,20 @@ var parseMetadata = metadata => {
                         point: {
                             events: {
                                 select: handlePointClick,
-                                unselect: handlePointClick
+                                unselect: handlePointClick,
+                                click: (event) => {
+                                    const chart = event.point.series.chart;
+                                    const rootId = chart.series[0].rootNode;
+                                    const rootNode = chart.series[0].nodeMap[rootId];
+                                    const rootLevel = rootNode?.level ?? 0;
+
+                                    console.log('New root level:', rootLevel);
+
+                                    const newLevels = chart.options.series[0]._generateLevels(rootLevel, totalLevels);
+                                    chart.series[0].update({
+                                        levels: newLevels
+                                    }); 
+                                }
                             },
                         },
                         dataLabels: {
@@ -456,26 +442,55 @@ var parseMetadata = metadata => {
             });
         }
 
-        _triggerLevel(levelId, chart, show) {
-            const levels = chart.series[0].options.levels;
-            const index = levels.findIndex(l => l.level === levelId);
-            if (index === -1) return;
+        _generateLevels(rootLevel, totalLevels) {
+            const levels = [];
 
-            const updatedLevel = Object.assign({}, levels[index], {
-                levelSize: {
-                    value: show ? 1 : 0
-                },
-                dataLabels: Object.assign({}, levels[index].dataLabels, {
-                    enabled: show
-                })
-            });
+            for (let i = 1; i <= totalLevels; i++) {
+                const show = i > rootLevel && i <= rootLevel + 2;
 
-            levels[index] = updatedLevel;
+                levels.push({
+                    level: i,
+                    levelSize: {
+                        value: show ? 1 : 0
+                    },
+                    dataLabels: {
+                        enabled: show
+                    },
+                    ...(i === 1 ? { colorByPoint: true } : {
+                        colorVariation: {
+                            key: 'brightness',
+                            to: 0.5
+                        }
+                    })
+                });
+            }
 
-            chart.series[0].update({ levels: levels });
-            console.log(`Triggering level ${levelId}: ${show ? 'show' : 'hide'}`);
+            return levels;
         }
 
+        _updateVisibleLevels(rootLevel, totalLevels) {
+            const chart = this._chart;
+            if (!chart || !chart.series || !chart.series[0]) {
+                return;
+            }
+
+            const levels = chart.series[0].options.levels.map(level => {
+                const show = level.level > rootLevel && level.level <= rootLevel + 2;
+
+                return {
+                    ...level,
+                    levelSize: {
+                        value: show ? 1 : 0
+                    },
+                    dataLabels: {
+                        ...(level.dataLabels || {}),
+                        enabled: show
+                    }
+                };
+            });
+
+            chart.series[0].update({ levels });
+        }
 
         /**
          * 
