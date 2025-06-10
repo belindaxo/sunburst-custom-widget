@@ -335,27 +335,6 @@ var parseMetadata = metadata => {
                         }
                     }
                 },
-                navigation: {
-                    breadcrumbs: {
-                        events: {
-                            click: (event) => {
-                                console.log('this: ', this);
-                                console.log('Breadcrumb clicked:', event);
-                                const chart = this._chart;
-                                const rootId = chart.series[0].rootNode;
-                                const rootNode = chart.series[0].nodeMap[rootId];
-                                const rootLevel = rootNode?.level ?? 0;
-
-                                console.log('New root level:', rootLevel);
-
-                                const newLevels = this._generateLevels(rootLevel, totalLevels);
-                                chart.series[0].update({
-                                    levels: newLevels
-                                });
-                            }
-                        }
-                    }
-                },
                 plotOptions: {
                     series: {
                         cursor: 'pointer',
@@ -385,6 +364,14 @@ var parseMetadata = metadata => {
                             enabled: true,
                             style: {
                                 fontWeight: 'normal'
+                            }
+                        },
+                        breadcrumbs: {
+                            events: {
+                                click: function(button, breadcrumbs) {
+                                    console.log('Breadcrumbs button:', button);
+                                    console.log('Breadcrumbs object class:', breadcrumbs);
+                                }
                             }
                         }
                     }
