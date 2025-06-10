@@ -1,5 +1,6 @@
 import * as Highcharts from 'highcharts';
 import 'highcharts/modules/sunburst.js';
+import 'highcharts/modules/exporting';
 
 /**
  * Parses metadata into structured dimensions and measures.
