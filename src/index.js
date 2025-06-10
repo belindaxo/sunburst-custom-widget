@@ -335,6 +335,26 @@ var parseMetadata = metadata => {
                         }
                     }
                 },
+                navigation: {
+                    breadcrumbs: {
+                        events: {
+                            click: (event) => {
+                                console.log('Breadcrumb clicked:', event);
+                                const chart = event.target.chart;
+                                const rootId = chart.series[0].rootNode;
+                                const rootNode = chart.series[0].nodeMap[rootId];
+                                const rootLevel = rootNode?.level ?? 0;
+
+                                console.log('New root level:', rootLevel);
+
+                                const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                chart.series[0].update({
+                                    levels: newLevels
+                                });
+                            }
+                        }
+                    }
+                },
                 plotOptions: {
                     series: {
                         cursor: 'pointer',
@@ -346,7 +366,6 @@ var parseMetadata = metadata => {
                                 click: (event) => {
                                     console.log('Point clicked:', event.point);
                                     const chart = event.point.series.chart;
-                                    const point = event.point;
                                     const rootId = chart.series[0].rootNode;
                                     const rootNode = chart.series[0].nodeMap[rootId];
                                     const rootLevel = rootNode?.level ?? 0;
