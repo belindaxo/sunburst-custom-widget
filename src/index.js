@@ -197,30 +197,6 @@ var parseMetadata = metadata => {
             const totalLevels = dimensions.length;
 
             const levels = this._generateLevels(0, totalLevels);
-
-            // for (let i = 1; i < totalLevels; i++) {
-            //     const levelConfig = {
-            //         level: i,
-            //         levelSize: {
-            //             value: i <= 2 ? 1 : 0
-            //         },
-            //         dataLabels: {
-            //             enabled: i <= 2
-            //         }
-            //     };
-
-            //     if (i === 1) {
-            //         levelConfig.colorByPoint = true; // Color by point for the first level
-            //     } else {
-            //         levelConfig.colorVariation = {
-            //             key: 'brightness',
-            //             to: 0.5
-            //         };
-            //     }
-
-            //     levels.push(levelConfig);
-            // }
-
             console.log('levels:', levels);
 
             const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
@@ -368,17 +344,22 @@ var parseMetadata = metadata => {
                                 select: handlePointClick,
                                 unselect: handlePointClick,
                                 click: (event) => {
+                                    console.log('Point clicked:', event.point);
                                     const chart = event.point.series.chart;
-                                    const rootId = chart.series[0].rootNode;
-                                    const rootNode = chart.series[0].nodeMap[rootId];
-                                    const rootLevel = rootNode?.level ?? 0;
+                                    const point = event.point;
 
-                                    console.log('New root level:', rootLevel);
+                                    chart.series[0].setRootNode(point.id, false, () => {
+                                        const rootId = chart.series[0].rootNode;
+                                        const rootNode = chart.series[0].nodeMap[rootId];
+                                        const rootLevel = rootNode?.level ?? 0;
 
-                                    const newLevels = this._generateLevels(rootLevel, totalLevels);
-                                    chart.series[0].update({
-                                        levels: newLevels
-                                    }); 
+                                        console.log('New root level:', rootLevel);
+
+                                        const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                        chart.series[0].update({
+                                            levels: newLevels
+                                        });
+                                    });
                                 }
                             },
                         },
