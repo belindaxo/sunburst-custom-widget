@@ -347,19 +347,17 @@ var parseMetadata = metadata => {
                                     console.log('Point clicked:', event.point);
                                     const chart = event.point.series.chart;
                                     const point = event.point;
+                                    const rootId = chart.series[0].rootNode;
+                                    const rootNode = chart.series[0].nodeMap[rootId];
+                                    const rootLevel = rootNode?.level ?? 0;
 
-                                    chart.series[0].setRootNode(point.id, false, () => {
-                                        const rootId = chart.series[0].rootNode;
-                                        const rootNode = chart.series[0].nodeMap[rootId];
-                                        const rootLevel = rootNode?.level ?? 0;
+                                    console.log('New root level:', rootLevel);
 
-                                        console.log('New root level:', rootLevel);
-
-                                        const newLevels = this._generateLevels(rootLevel, totalLevels);
-                                        chart.series[0].update({
-                                            levels: newLevels
-                                        });
+                                    const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                    chart.series[0].update({
+                                        levels: newLevels
                                     });
+
                                 }
                             },
                         },
