@@ -325,14 +325,17 @@ var parseMetadata = metadata => {
                 const updatedLevel = Object.assign({}, levels[index], { 
                     hidden: !show,
                     levelSize: {
-                        value: show ? 1 : 0,
-                        dataLabels: Object.assign({}, levels[index].dataLabels, { enabled: show })
-                    } 
+                        value: show ? 1 : 0
+                    },
+                    dataLabels: Object.assign({}, levels[index].dataLabels, {
+                        enabled: show
+                    })
                 });
 
                 levels[index] = updatedLevel;
 
                 chart.series[0].update({ levels: levels });
+                console.log(`Triggering level ${levelId}: ${show ? 'show' : 'hide'}`);
             };
 
             const chartOptions = {
