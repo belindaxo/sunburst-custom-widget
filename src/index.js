@@ -393,7 +393,7 @@ var parseMetadata = metadata => {
                 series: [{
                     type: 'sunburst',
                     name: measure.label || 'Value',
-                    data: allSeriesData,
+                    data: seriesData,
                     allowDrillToNode: true,
                     levels: levels
                 }]
