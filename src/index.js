@@ -303,6 +303,18 @@ var parseMetadata = metadata => {
                     type: 'sunburst',
                     style: {
                         fontFamily: "'72', sans-serif"
+                    },
+                    events: {
+                        click: () => {
+                            const linkedAnalysis = this.dataBindings.getDataBinding("databinding").getLinkedAnalysis();
+                            if (linkedAnalysis) {
+                                linkedAnalysis.removeFilters();
+                                if (this._selectedPoint) {
+                                    this._selectedPoint.select(false, false);
+                                    this._selectedPoint = null;
+                                }
+                            }
+                        }
                     }
                 },
                 title: {
