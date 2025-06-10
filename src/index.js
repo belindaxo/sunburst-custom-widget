@@ -345,7 +345,7 @@ var parseMetadata = metadata => {
                         fontFamily: "'72', sans-serif"
                     },
                     events: {
-                        drilldown: function (e) {
+                        drilldown: (e) => {
                             if (e.point && e.point.node) {
                                 const level = e.point.node.level;
                                 if (level === 1) {
@@ -354,7 +354,7 @@ var parseMetadata = metadata => {
                                 }
                             }
                         },
-                        drillup: function(e) {
+                        drillup: (e) => {
                             // Hide level 3 when drilling up
                             triggerLevel(3, this._chart, false);
                         }
