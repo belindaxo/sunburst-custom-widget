@@ -208,8 +208,8 @@ var parseMetadata = metadata => {
             levels.push({
                 level: 2,
                 colorVariation: {
-                        key: 'brightness',
-                        to: 0.5 // Adjust brightness for deeper levels
+                    key: 'brightness',
+                    to: 0.5 // Adjust brightness for deeper levels
                 }
             });
 
@@ -317,27 +317,6 @@ var parseMetadata = metadata => {
                 );
             };
 
-            const triggerLevel = (levelId, chart, show) => {
-                const levels = chart.series[0].options.levels;
-                const index = levels.findIndex(l => l.level === levelId);
-                if (index === -1) return;
-
-                const updatedLevel = Object.assign({}, levels[index], { 
-                    hidden: !show,
-                    levelSize: {
-                        value: show ? 1 : 0
-                    },
-                    dataLabels: Object.assign({}, levels[index].dataLabels, {
-                        enabled: show
-                    })
-                });
-
-                levels[index] = updatedLevel;
-
-                chart.series[0].update({ levels: levels });
-                console.log(`Triggering level ${levelId}: ${show ? 'show' : 'hide'}`);
-            };
-
             const chartOptions = {
                 chart: {
                     type: 'sunburst',
@@ -350,13 +329,13 @@ var parseMetadata = metadata => {
                                 const level = e.point.node.level;
                                 if (level === 1) {
                                     // Show level 3
-                                    triggerLevel(3, this._chart, true);    
+                                    this._triggerLevel(3, this._chart, true);
                                 }
                             }
                         },
                         drillup: (e) => {
                             // Hide level 3 when drilling up
-                            triggerLevel(3, this._chart, false);
+                            this._triggerLevel(3, this._chart, false);
                         }
                     }
                 },
@@ -474,6 +453,27 @@ var parseMetadata = metadata => {
                 );
             });
         }
+
+        _triggerLevel(levelId, chart, show) {
+            const levels = chart.series[0].options.levels;
+            const index = levels.findIndex(l => l.level === levelId);
+            if (index === -1) return;
+
+            const updatedLevel = Object.assign({}, levels[index], {
+                levelSize: {
+                    value: show ? 1 : 0
+                },
+                dataLabels: Object.assign({}, levels[index].dataLabels, {
+                    enabled: show
+                })
+            });
+
+            levels[index] = updatedLevel;
+
+            chart.series[0].update({ levels: levels });
+            console.log(`Triggering level ${levelId}: ${show ? 'show' : 'hide'}`);
+        }
+
 
         /**
          * 
