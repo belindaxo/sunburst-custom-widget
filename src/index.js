@@ -178,11 +178,16 @@ var parseMetadata = metadata => {
             const [measure] = measures;
 
             const allSeriesData = this._processSeriesData(data, dimensions, measure);
-            console.log('seriesData:', allSeriesData);
+            console.log('allSeriesData:', allSeriesData);
             const seriesData = allSeriesData.filter(node => {
                 const depth = node.id.split('/').length;
                 return depth <= this._currentLevel;
             });
+            console.log('Filtered seriesData (depth <=', this._currentLevel, '):', seriesData);
+            console.log('Root-level nodes:', seriesData.filter(n => n.parent === ''));
+
+
+
 
             const seriesName = measures[0]?.label || 'Value';
 
@@ -218,6 +223,8 @@ var parseMetadata = metadata => {
                     }
                 })
             }
+
+            console.log('Levels config:', levels);
 
             const validCategoryNames = allSeriesData.filter(node => node.parent === '').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
