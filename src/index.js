@@ -1,3 +1,4 @@
+
 import * as Highcharts from 'highcharts';
 import 'highcharts/modules/sunburst.js';
 import 'highcharts/modules/exporting';
@@ -53,7 +54,6 @@ var parseMetadata = metadata => {
 
             this._lastSentCategories = [];
             this._selectedPoint = null;
-            this._currentLevel = 2;
         }
 
         /**
@@ -177,17 +177,8 @@ var parseMetadata = metadata => {
             const [dimension] = dimensions;
             const [measure] = measures;
 
-            const allSeriesData = this._processSeriesData(data, dimensions, measure);
-            console.log('allSeriesData:', allSeriesData);
-            const seriesData = allSeriesData.filter(node => {
-                const depth = node.id.split('/').length;
-                return depth <= this._currentLevel;
-            });
-            console.log('Filtered seriesData (depth <=', this._currentLevel, '):', seriesData);
-            console.log('Root-level nodes:', seriesData.filter(n => n.parent === ''));
-
-
-
+            const seriesData = this._processSeriesData(data, dimensions, measure);
+            console.log('seriesData:', seriesData);
 
             const seriesName = measures[0]?.label || 'Value';
 
@@ -224,9 +215,7 @@ var parseMetadata = metadata => {
                 })
             }
 
-            console.log('Levels config:', levels);
-
-            const validCategoryNames = allSeriesData.filter(node => node.parent === '').map(node => node.name) || [];
+            const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
                 this._lastSentCategories = validCategoryNames;
@@ -272,7 +261,7 @@ var parseMetadata = metadata => {
             const defaultColors = ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7'];
             const customColors = this.customColors || [];
 
-            allSeriesData.forEach(node => {
+            seriesData.forEach(node => {
                 if (node.parent === '') {
                     const colorEntry = customColors.find(c => c.category === node.name);
                     if (colorEntry && colorEntry.color) {
@@ -285,7 +274,7 @@ var parseMetadata = metadata => {
                 }
             });
 
-            console.log('seriesData with colors:', allSeriesData);
+            console.log('seriesData with colors:', seriesData);
 
             Highcharts.SVGRenderer.prototype.symbols.contextButton = function (x, y, w, h) {
                 const radius = w * 0.11;
@@ -368,17 +357,7 @@ var parseMetadata = metadata => {
                         allowPointSelect: true,
                         point: {
                             events: {
-                                select: (event) => {
-                                    handlePointClick(event);
-
-                                    const node = event.target;
-                                    const depth = node.id.split('/').length;
-
-                                    if (depth === this._currentLevel) {
-                                        this._currentLevel++;
-                                        this._renderChart();
-                                    }
-                                },
+                                select: handlePointClick,
                                 unselect: handlePointClick
                             },
                         },
