@@ -425,7 +425,7 @@ var parseMetadata = metadata => {
             const levels = [];
 
             for (let i = 1; i <= totalLevels; i++) {
-                const show = i > rootLevel && i <= rootLevel + 2;
+                const show = i >= rootLevel && i <= rootLevel + 2;
 
                 levels.push({
                     level: i,
