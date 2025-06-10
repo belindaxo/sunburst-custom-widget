@@ -234,6 +234,25 @@ var parseMetadata = metadata => {
             Highcharts.setOptions({
                 lang: {
                     thousandsSep: ','
+                },
+                navigation: {
+                    buttonOptions: {
+                        symbolStroke: '#004b8d',  // Outline color
+                        symbolFill: 'transparent', // No fill
+                        symbolStrokeWidth: 1,
+                        // Core button shape settings
+                        height: 32,          // Ensure square for circle
+                        width: 32,
+                        theme: {
+                            r: 16,           // Rounded corners (half width = full circle)
+                            fill: '#f7f7f7', // Background color
+                            stroke: '#ccc',  // Thin outer border
+                            'stroke-width': 0.8,
+                            style: {
+                                cursor: 'pointer'
+                            }
+                        }
+                    }
                 }
             });
 
@@ -254,6 +273,29 @@ var parseMetadata = metadata => {
             });
 
             console.log('seriesData with colors:', seriesData);
+
+            Highcharts.SVGRenderer.prototype.symbols.contextButton = function (x, y, w, h) {
+                const radius = w * 0.11;
+                const spacing = w * 0.4;
+
+                const offsetY = 2;    // moves dots slightly down
+                const offsetX = 1;  // moves dots slightly to the right
+
+                const centerY = y + h / 2 + offsetY;
+                const startX = x + (w - spacing * 2) / 2 + offsetX;
+
+                const makeCirclePath = (cx, cy, r) => [
+                    'M', cx - r, cy,
+                    'A', r, r, 0, 1, 0, cx + r, cy,
+                    'A', r, r, 0, 1, 0, cx - r, cy
+                ];
+
+                return [].concat(
+                    makeCirclePath(startX, centerY, radius),
+                    makeCirclePath(startX + spacing, centerY, radius),
+                    makeCirclePath(startX + spacing * 2, centerY, radius)
+                );
+            };
 
             const chartOptions = {
                 chart: {
@@ -282,6 +324,30 @@ var parseMetadata = metadata => {
                 },
                 credits: {
                     enabled: false
+                },
+                exporting: {
+                    enabled: true,
+                    buttons: {
+                        contextButton: {
+                            enabled: false,
+                        }
+                    },
+                    menuItemDefinitions: {
+                        resetFilters: {
+                            text: 'Reset Filters',
+                            onclick: () => {
+                                const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
+                                if (linkedAnalysis) {
+                                    linkedAnalysis.removeFilters();
+                                    if (this._selectedPoint) {
+                                        this._selectedPoint.select(false, false);
+                                        this._selectedPoint = null;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
                 },
                 plotOptions: {
                     series: {
@@ -317,6 +383,40 @@ var parseMetadata = metadata => {
                 }]
             };
             this._chart = Highcharts.chart(this.shadowRoot.getElementById('container'), chartOptions);
+
+            const container = this.shadowRoot.getElementById('container');
+
+            container.addEventListener("mouseenter", () => {
+                this._chart.update(
+                    {
+                        exporting: {
+                            buttons: {
+                                contextButton: {
+                                    enabled: true,
+                                    symbol: 'contextButton',
+                                    menuItems: ['resetFilters']
+                                },
+                            },
+                        },
+                    },
+                    true
+                ); // true = redraw
+            });
+
+            container.addEventListener("mouseleave", () => {
+                this._chart.update(
+                    {
+                        exporting: {
+                            buttons: {
+                                contextButton: {
+                                    enabled: false,
+                                },
+                            },
+                        },
+                    },
+                    true
+                );
+            });
         }
 
         /**
