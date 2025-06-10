@@ -385,7 +385,7 @@ var parseMetadata = metadata => {
                             click: function (button, breadcrumbs) {
                                 console.log('Breadcrumbs button:', button);
                                 console.log('Breadcrumbs object class:', breadcrumbs);
-                                const chart = breadcrumbs.levelOptions.series.chart;
+                                const chart = this._chart;
                                 const series = chart.series[0];
                                 const newLevel = button.newLevel;
                                 const rootLevel = newLevel ?? 0;
