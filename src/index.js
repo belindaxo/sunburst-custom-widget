@@ -1,7 +1,7 @@
-
 import * as Highcharts from 'highcharts';
 import 'highcharts/modules/sunburst.js';
 import 'highcharts/modules/exporting';
+import 'highcharts/modules/drilldown';
 
 /**
  * Parses metadata into structured dimensions and measures.
@@ -204,15 +204,31 @@ var parseMetadata = metadata => {
                 colorByPoint: true
             });
 
-            // Levels 2 to totalLevels: inherit and apply brightness variation
-            for (let i = 2; i <= totalLevels; i++) {
+            // Level 2
+            levels.push({
+                level: 2,
+                colorVariation: {
+                        key: 'brightness',
+                        to: 0.5 // Adjust brightness for deeper levels
+                }
+            });
+
+            // Levels 3 to totalLevels: inherit and apply brightness variation
+            for (let i = 3; i <= totalLevels; i++) {
                 levels.push({
                     level: i,
                     colorVariation: {
                         key: 'brightness',
                         to: 0.5 // Adjust brightness for deeper levels
+                    },
+                    hidden: true,
+                    dataLabels: {
+                        enabled: false
+                    },
+                    levelSize: {
+                        value: 0
                     }
-                })
+                });
             }
 
             console.log('levels:', levels);
@@ -301,11 +317,44 @@ var parseMetadata = metadata => {
                 );
             };
 
+            const triggerLevel = (levelId, chart, show) => {
+                const levels = chart.series[0].options.levels;
+                const index = levels.findIndex(l => l.level === levelId);
+                if (index === -1) return;
+
+                const updatedLevel = Object.assign({}, levels[index], { 
+                    hidden: !show,
+                    levelSize: {
+                        value: show ? 1 : 0,
+                        dataLabels: Object.assign({}, levels[index].dataLabels, { enabled: show })
+                    } 
+                });
+
+                levels[index] = updatedLevel;
+
+                chart.series[0].update({ levels: levels });
+            };
+
             const chartOptions = {
                 chart: {
                     type: 'sunburst',
                     style: {
                         fontFamily: "'72', sans-serif"
+                    },
+                    events: {
+                        drilldown: function (e) {
+                            if (e.point && e.point.node) {
+                                const level = e.point.node.level;
+                                if (level === 1) {
+                                    // Show level 3
+                                    triggerLevel(3, this._chart, true);    
+                                }
+                            }
+                        },
+                        drillup: function(e) {
+                            // Hide level 3 when drilling up
+                            triggerLevel(3, this._chart, false);
+                        }
                     }
                 },
                 title: {
