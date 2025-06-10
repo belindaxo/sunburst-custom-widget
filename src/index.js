@@ -325,6 +325,7 @@ var parseMetadata = metadata => {
                     },
                     events: {
                         drilldown: (e) => {
+                            console.log("Drilldown event:", e);
                             if (e.point && e.point.node) {
                                 const level = e.point.node.level;
                                 if (level === 1) {
@@ -334,6 +335,7 @@ var parseMetadata = metadata => {
                             }
                         },
                         drillup: (e) => {
+                            console.log("Drillup event:", e);
                             // Hide level 3 when drilling up
                             this._triggerLevel(3, this._chart, false);
                         }
