@@ -375,7 +375,7 @@ var parseMetadata = metadata => {
 
                                     console.log('New root level:', rootLevel);
 
-                                    const newLevels = chart.options.series[0]._generateLevels(rootLevel, totalLevels);
+                                    const newLevels = this._generateLevels(rootLevel, totalLevels);
                                     chart.series[0].update({
                                         levels: newLevels
                                     }); 
