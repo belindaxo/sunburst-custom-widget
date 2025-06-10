@@ -53,6 +53,7 @@ var parseMetadata = metadata => {
 
             this._lastSentCategories = [];
             this._selectedPoint = null;
+            this._currentLevel = 2;
         }
 
         /**
@@ -176,8 +177,12 @@ var parseMetadata = metadata => {
             const [dimension] = dimensions;
             const [measure] = measures;
 
-            const seriesData = this._processSeriesData(data, dimensions, measure);
-            console.log('seriesData:', seriesData);
+            const allSeriesData = this._processSeriesData(data, dimensions, measure);
+            console.log('seriesData:', allSeriesData);
+            const seriesData = allSeriesData.filter(node => {
+                const depth = node.id.split('/').length;
+                return depth <= this._currentLevel;
+            });
 
             const seriesName = measures[0]?.label || 'Value';
 
@@ -214,7 +219,7 @@ var parseMetadata = metadata => {
                 })
             }
 
-            const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
+            const validCategoryNames = allSeriesData.filter(node => node.parent === '').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
                 this._lastSentCategories = validCategoryNames;
@@ -260,7 +265,7 @@ var parseMetadata = metadata => {
             const defaultColors = ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7'];
             const customColors = this.customColors || [];
 
-            seriesData.forEach(node => {
+            allSeriesData.forEach(node => {
                 if (node.parent === '') {
                     const colorEntry = customColors.find(c => c.category === node.name);
                     if (colorEntry && colorEntry.color) {
@@ -273,7 +278,7 @@ var parseMetadata = metadata => {
                 }
             });
 
-            console.log('seriesData with colors:', seriesData);
+            console.log('seriesData with colors:', allSeriesData);
 
             Highcharts.SVGRenderer.prototype.symbols.contextButton = function (x, y, w, h) {
                 const radius = w * 0.11;
@@ -356,7 +361,17 @@ var parseMetadata = metadata => {
                         allowPointSelect: true,
                         point: {
                             events: {
-                                select: handlePointClick,
+                                select: (event) => {
+                                    handlePointClick;
+
+                                    const node = event.target;
+                                    const depth = node.id.split('/').length;
+
+                                    if (depth === this._currentLevel) {
+                                        this._currentLevel++;
+                                        this._renderChart();
+                                    }
+                                },
                                 unselect: handlePointClick
                             },
                         },
@@ -378,7 +393,7 @@ var parseMetadata = metadata => {
                 series: [{
                     type: 'sunburst',
                     name: measure.label || 'Value',
-                    data: seriesData,
+                    data: allSeriesData,
                     allowDrillToNode: true,
                     levels: levels
                 }]
