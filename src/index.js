@@ -336,28 +336,6 @@ var parseMetadata = metadata => {
                     }
                 },
                 plotOptions: {
-                    sunburst: {
-                        breadcrumbs: {
-                            events: {
-                                click: function(button, breadcrumbs) {
-                                    console.log('Breadcrumbs button:', button);
-                                    console.log('Breadcrumbs object class:', breadcrumbs);
-                                    // const chart = breadcrumbs.chart;
-                                    // const series = chart.series[0];
-                                    // const rootId = button.newRoot;
-                                    // const rootNode = series.nodeMap[rootId];
-                                    // const rootLevel = rootNode?.level ?? 0;
-
-                                    // console.log('New root level:', rootLevel);
-
-                                    // const newLevels = this._generateLevels(rootLevel, totalLevels);
-                                    // series.update({
-                                    //     levels: newLevels
-                                    // });
-                                }//.bind(this)
-                            }
-                        }
-                    },
                     series: {
                         cursor: 'pointer',
                         allowPointSelect: true,
@@ -401,7 +379,27 @@ var parseMetadata = metadata => {
                     name: measure.label || 'Value',
                     data: seriesData,
                     allowDrillToNode: true,
-                    levels: levels
+                    levels: levels,
+                    breadcrumbs: {
+                        events: {
+                            click: function (button, breadcrumbs) {
+                                console.log('Breadcrumbs button:', button);
+                                console.log('Breadcrumbs object class:', breadcrumbs);
+                                // const chart = breadcrumbs.chart;
+                                // const series = chart.series[0];
+                                // const rootId = button.newRoot;
+                                // const rootNode = series.nodeMap[rootId];
+                                // const rootLevel = rootNode?.level ?? 0;
+
+                                // console.log('New root level:', rootLevel);
+
+                                // const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                // series.update({
+                                //     levels: newLevels
+                                // });
+                            }//.bind(this)
+                        }
+                    }
                 }]
             };
             this._chart = Highcharts.chart(this.shadowRoot.getElementById('container'), chartOptions);
