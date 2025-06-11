@@ -362,14 +362,17 @@ var parseMetadata = metadata => {
                                 unselect: handlePointClick,
                                 click: (event) => {
                                     const clickedPoint = event.point;
-                                    console.log('Point click event - point:', clickedPoint);
+                                    if (clickedPoint.id === 'Root') {
+                                        console.log('point.events.click - Root node clicked, no action taken.');
+                                        return; // No action for root node click
+                                    }
+                                    console.log('point.events.click - point:', clickedPoint);
                                     const chart = clickedPoint.series.chart;
                                     const rootId = chart.series[0].rootNode;
                                     const rootNode = chart.series[0].nodeMap[rootId];
 
-                                    const rootLevel = rootNode?.level ?? 0;
-
-                                    console.log('Point click event - New root level:', rootLevel);
+                                    const rootLevel = rootNode?.level ?? 1;
+                                    console.log('point.events.click - New root level:', rootLevel);
 
                                     const newLevels = this._generateLevels(rootLevel, totalLevels);
                                     chart.series[0].update({
@@ -462,11 +465,7 @@ var parseMetadata = metadata => {
             levels.push({
                 level: 1,
                 dataLabels: {
-                    filter: {
-                        property: 'outerArcLength',
-                        operator: '>',
-                        value: 64
-                    }
+                    enabled: false
                 }
             });
 
@@ -570,11 +569,19 @@ var parseMetadata = metadata => {
                 if (this.point) {
                     // Retrieve the category data using the index
                     const name = this.point.name;
-                    const description = this.point.description || 'Description';
+                    const description = this.point.description || '';
                     const { scaledValue, valueSuffix } = scaleFormat(this.point.value);
                     const value = Highcharts.numberFormat(scaledValue, -1, '.', ',');
                     const valueWithSuffix = `${value} ${valueSuffix}`;
-                    return `
+                    if (this.point.id === 'Root') {
+                        return `
+                        <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
+                        <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
+                            <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
+                        </div>
+                    `;
+                    } else {
+                        return `
                         <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
                         <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
                             <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
@@ -587,7 +594,7 @@ var parseMetadata = metadata => {
                             </table>
                         </div>
                     `;
-
+                    }
                 } else {
                     return 'error with data';
                 }
