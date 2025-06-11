@@ -116,7 +116,7 @@ var parseMetadata = metadata => {
             let total = 0;
 
             data.forEach(row => {
-                let parentId = ''; // Start with a root parent ID
+                let parentId = 'Root'; // Start with a root parent ID
                 let pathId = '';
 
                 dimensions.forEach((dim, level) => {
@@ -148,7 +148,7 @@ var parseMetadata = metadata => {
             });
 
             const rootNode = {
-                id: '',
+                id: 'Root',
                 parent: '',
                 name: measure.label,
                 description: '',
@@ -205,12 +205,12 @@ var parseMetadata = metadata => {
 
             const autoTitle = `${seriesName} per ${dimPart}`;
 
-            const totalLevels = dimensions.length;
+            const totalLevels = dimensions.length + 1;
 
             const levels = this._generateLevels(1, totalLevels);
             console.log('_generateLevels - Levels:', levels);
 
-            const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
+            const validCategoryNames = seriesData.filter(node => node.parent === 'Root').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
                 this._lastSentCategories = validCategoryNames;
@@ -257,11 +257,11 @@ var parseMetadata = metadata => {
             const customColors = this.customColors || [];
 
             seriesData.forEach(node => {
-                if (node.id === '') {
+                if (node.id === 'Root') {
                     node.color = '#ffffff'; // Root node color
                     return;
                 }
-                if (node.parent === '') {
+                if (node.parent === 'Root') {
                     const colorEntry = customColors.find(c => c.category === node.name);
                     if (colorEntry && colorEntry.color) {
                         node.color = colorEntry.color;
@@ -371,7 +371,7 @@ var parseMetadata = metadata => {
                                     console.log('point.events.click - rootId:', rootId);
                                     console.log('point.events.click - rootNode:', rootNode);
 
-                                    const rootLevel = rootNode?.level;
+                                    const rootLevel = (rootNode?.id === '') ? 1 : (rootNode.level);
                                     console.log('point.events.click - New root level:', rootLevel);
 
                                     const newLevels = this._generateLevels(rootLevel, totalLevels);
@@ -461,8 +461,8 @@ var parseMetadata = metadata => {
         _generateLevels(rootLevel, totalLevels) {
             const levels = [];
 
-            // Add real data levels, starting from 2
-            for (let i = 0; i <= totalLevels; i++) {
+            // Add data levels, starting from 1
+            for (let i = 1; i <= totalLevels; i++) {
                 const show = i >= rootLevel && i <= rootLevel + 2;
 
                 const baseLevel = {
@@ -475,12 +475,12 @@ var parseMetadata = metadata => {
                     }
                 };
 
-                if (i === 1) {
+                if (i === 2) {
                     levels.push({
                         ...baseLevel,
                         colorByPoint: true
                     });
-                } else if (i === 0) {
+                } else if (i === 1) {
                     levels.push({
                         ...baseLevel,
                         dataLabels: {
@@ -496,6 +496,22 @@ var parseMetadata = metadata => {
                         }
                     });
                 }
+
+                levels.push({
+                    level: i,
+                    levelSize: {
+                        value: show ? 1 : 0
+                    },
+                    dataLabels: {
+                        enabled: show
+                    },
+                    ...(i === 2 ? { colorByPoint: true } : {
+                        colorVariation: {
+                            key: 'brightness',
+                            to: (i % 2 === 0 ? -0.5 : 0.5)
+                        }
+                    })
+                });
             }
 
             return levels;
@@ -581,7 +597,7 @@ var parseMetadata = metadata => {
                     const { scaledValue, valueSuffix } = scaleFormat(this.point.value);
                     const value = Highcharts.numberFormat(scaledValue, -1, '.', ',');
                     const valueWithSuffix = `${value} ${valueSuffix}`;
-                    if (this.point.id === '') {
+                    if (this.point.id === 'Root') {
                         return `
                         <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
                         <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
