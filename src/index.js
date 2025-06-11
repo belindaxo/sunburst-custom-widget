@@ -358,40 +358,26 @@ var parseMetadata = metadata => {
                         allowPointSelect: true,
                         point: {
                             events: {
-                                select: handlePointClick,
-                                unselect: handlePointClick,
+                                // select: handlePointClick,
+                                // unselect: handlePointClick,
                                 click: (event) => {
                                     const clickedPoint = event.point;
+                                    console.log('point.events.click - clickedPoint:', clickedPoint);
+                                    console.log('point.events.click - clickedPoint.id:', clickedPoint.id);
                                     const chart = clickedPoint.series.chart;
                                     const series = chart.series[0];
-                                    const currentRootId = series.rootNode;
-                                    console.log('point.events.click drill up - Current Node ID:', currentRootId);
+                                    const rootId = series.rootNode;
+                                    const rootNode = series.nodeMap[rootId];
+                                    console.log('point.events.click - rootId:', rootId);
+                                    console.log('point.events.click - rootNode:', rootNode);
 
-                                    // CASE 1: Drill up - clicking on the current center node
-                                    if (clickedPoint.id === currentRootId) {
-                                        const currentRootNode = series.nodeMap[currentRootId];
-                                        const parentNodeId = currentRootNode.parent;
-                                        console.log('point.events.click drill up - Parent Node ID:', parentNodeId);
-                                        
-                                        // Only drill up if parent exists
-                                        if (parentNodeId) {
-                                            const parentNode = series.nodeMap[parentNodeId];
-                                            const rootLevel = parentNode.level ?? 1; //fallback to level 1 (Root)
+                                    const rootLevel = rootNode?.level ?? 1;
+                                    console.log('point.events.click - New root level:', rootLevel);
 
-                                            const newLevels = this._generateLevels(rootLevel, totalLevels);
-                                            series.setRootNode(parentNodeId);
-                                            series.update({ levels: newLevels });
-                                        }
-
-                                    // CASE 2: Drill down - clicking a child node
-                                    } else {
-                                        const clickedLevel = clickedPoint.node.level ?? 1; // Fallback to level 1 (Root)
-                                        console.log('point.events.click drill down - Clicked Level:', clickedLevel);
-
-                                        const newLevels = this._generateLevels(clickedLevel, totalLevels);
-                                        series.setRootNode(clickedPoint.id);
-                                        series.update({ levels: newLevels });
-                                    }
+                                    const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                    series.update({
+                                        levels: newLevels
+                                    });
                                 }
                             },
                         },
@@ -620,16 +606,16 @@ var parseMetadata = metadata => {
             if (!point) {
                 return;
             }
-            console.log('_handlePointClick - point clicked:', point);
+            // console.log('_handlePointClick - point clicked:', point);
 
             const name = point.name;
             const path = point.id;
             const level = path.split('/').length - 1;
             const labels = path.split('/');
 
-            console.log('_handlePointClick - Path:', path);
-            console.log('_handlePointClick - Level:', level);
-            console.log('_handlePointClick - Labels:', labels);
+            // console.log('_handlePointClick - Path:', path);
+            // console.log('_handlePointClick - Level:', level);
+            // console.log('_handlePointClick - Labels:', labels);
 
             const dimension = dimensions[level];
             if (!dimension) {
@@ -649,11 +635,11 @@ var parseMetadata = metadata => {
 
             // Deselect previously selected point
             if (this._selectedPoint && this._selectedPoint !== point) {
-                console.log('_handlePointClick - Deselecting previously selected point:', this._selectedPoint);
+                // console.log('_handlePointClick - Deselecting previously selected point:', this._selectedPoint);
                 linkedAnalysis.removeFilters();
                 this._selectedPoint.select(false, false);
                 this._selectedPoint = null;
-                console.log('_handlePointClick - Deselect complete. Selected Point:', this._selectedPoint);
+                // console.log('_handlePointClick - Deselect complete. Selected Point:', this._selectedPoint);
             }
 
             if (event.type === 'select') {
@@ -669,16 +655,16 @@ var parseMetadata = metadata => {
                     linkedAnalysis.setFilters(selection);
                     this._selectedPoint = point;
 
-                    console.log('_handlePointClick select - Selection:', selection);
-                    console.log('_handlePointClick select - Selected Point:', this._selectedPoint);
-                    console.log('_handlePointClick select - Linked Analysis:', linkedAnalysis);
+                    // console.log('_handlePointClick select - Selection:', selection);
+                    // console.log('_handlePointClick select - Selected Point:', this._selectedPoint);
+                    // console.log('_handlePointClick select - Linked Analysis:', linkedAnalysis);
                 }
             } else if (event.type === 'unselect') {
                 linkedAnalysis.removeFilters();
                 this._selectedPoint = null;
 
-                console.log('_handlePointClick unselect - Selected Point:', this._selectedPoint);
-                console.log('_handlePointClick unselect - Linked Analysis:', linkedAnalysis);
+                // console.log('_handlePointClick unselect - Selected Point:', this._selectedPoint);
+                // console.log('_handlePointClick unselect - Linked Analysis:', linkedAnalysis);
 
             }
         }
