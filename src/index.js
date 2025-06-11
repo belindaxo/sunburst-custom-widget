@@ -453,7 +453,7 @@ var parseMetadata = metadata => {
         _generateLevels(rootLevel, totalLevels) {
             const levels = [];
 
-            for (let i = 1; i <= totalLevels; i++) {
+            for (let i = 0; i <= totalLevels; i++) {
                 const show = i >= rootLevel && i <= rootLevel + 2;
 
                 levels.push({
@@ -464,12 +464,17 @@ var parseMetadata = metadata => {
                     dataLabels: {
                         enabled: show
                     },
-                    ...(i === 1 ? { colorByPoint: true } : {
-                        colorVariation: {
-                            key: 'brightness',
-                            to: 0.5
+                    ...(i === 1 
+                        ? { colorByPoint: true } 
+                        : i > 1
+                        ? {
+                            colorVariation: {
+                                key: 'brightness',
+                                to: 0.5
+                            }
                         }
-                    })
+                        : {} // For level 0, no color variation
+                    )
                 });
             }
 
