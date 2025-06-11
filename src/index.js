@@ -379,29 +379,32 @@ var parseMetadata = metadata => {
                                         levels: newLevels
                                     });
 
-                                    // // FILTERING LOGIC
-                                    // const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
-                                    // if (!linkedAnalysis) return;
+                                    // FILTERING LOGIC
+                                    const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
+                                    if (!linkedAnalysis) return;
 
-                                    // if (rootLevel === 1) {
-                                    //     linkedAnalysis.removeFilters();
-                                    //     return;
-                                    // }
+                                    if (rootLevel === 1) {
+                                        console.log('point.events.click - Removing filters for root level');
+                                        linkedAnalysis.removeFilters();
+                                        return;
+                                    }
 
-                                    // // Remove existing filters before applying new ones
-                                    // linkedAnalysis.removeFilters();
+                                    // Remove existing filters before applying new ones
+                                    console.log('point.events.click - Removing existing filters');
+                                    linkedAnalysis.removeFilters();
 
-                                    // const labels = rootId.split('/');
-                                    // const selection = {};
-                                    // labels.forEach((label, index) => {
-                                    //     const dim = dimensions[index];
-                                    //     const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                    //     if (dim && matchingRow) {
-                                    //         selection[dim.id] = matchingRow[dim.key].id;
-                                    //     }
-                                    // });
+                                    const labels = rootId.split('/');
+                                    const selection = {};
+                                    labels.forEach((label, index) => {
+                                        const dim = dimensions[index];
+                                        const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                        if (dim && matchingRow) {
+                                            selection[dim.id] = matchingRow[dim.key].id;
+                                        }
+                                    });
+                                    console.log('point.events.click - Selection:', selection);
 
-                                    // linkedAnalysis.setFilters(selection);
+                                    linkedAnalysis.setFilters(selection);
                                 }
                             },
                         },
@@ -433,7 +436,6 @@ var parseMetadata = metadata => {
                                 console.log('Breadcrumbs object class:', breadcrumbs);
                                 const chart = this._chart;
                                 const series = chart.series[0];
-                                console.log('Breadcrumbs - button.newLevel: ', button.newLevel);
                                 const newLevel = breadcrumbs.level;
                                 console.log('Breadcrumbs - breadcrumbs.level:', newLevel);
                                 const rootLevel = (newLevel === 0) ? 1 : newLevel;
@@ -444,29 +446,35 @@ var parseMetadata = metadata => {
                                     levels: newLevels
                                 });
 
-                                // // FILTERING LOGIC
-                                // const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
-                                // if (!linkedAnalysis) return;
+                                // FILTERING LOGIC
+                                const rootId = breadcrumbs.levelOptions.id;
+                                console.log('Breadcrumbs - rootId:', rootId);
+                                const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
+                                if (!linkedAnalysis) return;
 
-                                // if (rootLevel === 1 || rootLevel === 0) {
-                                //     linkedAnalysis.removeFilters();
-                                //     return;
-                                // }
+                                if (rootLevel === 1) {
+                                    console.log('Breadcrumbs - Removing filters for root level');
+                                    linkedAnalysis.removeFilters();
+                                    return;
+                                }
 
-                                // // Remove existing filters before applying new ones
-                                // linkedAnalysis.removeFilters();
+                                // Remove existing filters before applying new ones
+                                console.log('Breadcrumbs - Removing existing filters');
+                                linkedAnalysis.removeFilters();
 
-                                // const labels = rootId.split('/');
-                                // const selection = {};
-                                // labels.forEach((label, index) => {
-                                //     const dim = dimensions[index];
-                                //     const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                //     if (dim && matchingRow) {
-                                //         selection[dim.id] = matchingRow[dim.key].id;
-                                //     }
-                                // });
+                                const labels = rootId.split('/');
+                                console.log('Breadcrumbs - Labels:', labels);
+                                const selection = {};
+                                labels.forEach((label, index) => {
+                                    const dim = dimensions[index];
+                                    const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                    if (dim && matchingRow) {
+                                        selection[dim.id] = matchingRow[dim.key].id;
+                                    }
+                                });
+                                console.log('Breadcrumbs - Selection:', selection);
 
-                                // linkedAnalysis.setFilters(selection);
+                                linkedAnalysis.setFilters(selection);
                             }.bind(this)
                         }
                     }
