@@ -538,7 +538,9 @@ var parseMetadata = metadata => {
                         value: show ? 1 : 0
                     },
                     dataLabels: {
-                        enabled: show
+                        enabled: show,
+                        x: 0,
+                        y: 0,
                     },
                     ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
