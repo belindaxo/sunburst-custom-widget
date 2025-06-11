@@ -378,6 +378,30 @@ var parseMetadata = metadata => {
                                     series.update({
                                         levels: newLevels
                                     });
+
+                                    // // FILTERING LOGIC
+                                    // const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
+                                    // if (!linkedAnalysis) return;
+
+                                    // if (rootLevel === 1) {
+                                    //     linkedAnalysis.removeFilters();
+                                    //     return;
+                                    // }
+
+                                    // // Remove existing filters before applying new ones
+                                    // linkedAnalysis.removeFilters();
+
+                                    // const labels = rootId.split('/');
+                                    // const selection = {};
+                                    // labels.forEach((label, index) => {
+                                    //     const dim = dimensions[index];
+                                    //     const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                    //     if (dim && matchingRow) {
+                                    //         selection[dim.id] = matchingRow[dim.key].id;
+                                    //     }
+                                    // });
+
+                                    // linkedAnalysis.setFilters(selection);
                                 }
                             },
                         },
@@ -416,6 +440,30 @@ var parseMetadata = metadata => {
                                 series.update({
                                     levels: newLevels
                                 });
+
+                                // // FILTERING LOGIC
+                                // const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
+                                // if (!linkedAnalysis) return;
+
+                                // if (rootLevel === 1 || rootLevel === 0) {
+                                //     linkedAnalysis.removeFilters();
+                                //     return;
+                                // }
+
+                                // // Remove existing filters before applying new ones
+                                // linkedAnalysis.removeFilters();
+
+                                // const labels = rootId.split('/');
+                                // const selection = {};
+                                // labels.forEach((label, index) => {
+                                //     const dim = dimensions[index];
+                                //     const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                //     if (dim && matchingRow) {
+                                //         selection[dim.id] = matchingRow[dim.key].id;
+                                //     }
+                                // });
+
+                                // linkedAnalysis.setFilters(selection);
                             }.bind(this)
                         }
                     }
@@ -492,21 +540,6 @@ var parseMetadata = metadata => {
                     });
                 }
 
-                levels.push({
-                    level: i,
-                    levelSize: {
-                        value: show ? 1 : 0
-                    },
-                    dataLabels: {
-                        enabled: show
-                    },
-                    ...(i === 2 ? { colorByPoint: true } : {
-                        colorVariation: {
-                            key: 'brightness',
-                            to: (i % 2 === 0 ? -0.5 : 0.5)
-                        }
-                    })
-                });
             }
 
             return levels;
