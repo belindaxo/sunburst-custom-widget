@@ -114,28 +114,19 @@ var parseMetadata = metadata => {
             const seriesData = [];
             const nodeMap = new Map();
 
-
-            seriesData.push({
-                id: 'superRoot',
-                parent: '',
-                name: measure.label,
-                color: '#004b8d'
-            });
-
             data.forEach(row => {
-                let parentId = 'superRoot';
+                let parentId = '';
                 let pathId = '';
 
                 dimensions.forEach((dim, level) => {
                     const value = row[dim.key].label || `Unknown-${level}`;
                     pathId += (pathId ? '/' : '') + value;
-                    const nodeId = `superRoot/${pathId}`;
 
                     if (!nodeMap.has(pathId)) {
                         nodeMap.set(pathId, true);
 
                         const node = {
-                            id: nodeId,
+                            id: pathId,
                             parent: parentId,
                             name: value,
                             description: dim.description || '',
@@ -149,7 +140,7 @@ var parseMetadata = metadata => {
                         seriesData.push(node);
                     }
 
-                    parentId = nodeId; // Update parentId for the next level
+                    parentId = pathId; // Update parentId for the next level
                 });
             });
 
@@ -204,12 +195,12 @@ var parseMetadata = metadata => {
             const autoTitle = `${seriesName} per ${dimPart}`;
             console.log('autoTitle:', autoTitle);
 
-            const totalLevels = dimensions.length + 1;
+            const totalLevels = dimensions.length;
 
             const levels = this._generateLevels(0, totalLevels);
             console.log('levels:', levels);
 
-            const validCategoryNames = seriesData.filter(node => node.parent === 'superRoot').map(node => node.name) || [];
+            const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
                 this._lastSentCategories = validCategoryNames;
@@ -356,18 +347,11 @@ var parseMetadata = metadata => {
                                 click: (event) => {
                                     const clickedPoint = event.point;
                                     console.log('Point clicked:', clickedPoint);
-                                    if (clickedPoint.id === 'superRoot') {
-                                        console.log('Clicked super root — no drilldown');
-                                        return;
-                                    }
 
                                     const chart = clickedPoint.series.chart;
                                     const rootId = chart.series[0].rootNode;
                                     const rootNode = chart.series[0].nodeMap[rootId];
-                                    if (rootId === 'superRoot') {
-                                        console.log('Clicked super root — no drilldown');
-                                        return;
-                                    }
+                                    
                                     const rootLevel = rootNode?.level ?? 0;
 
                                     console.log('New root level:', rootLevel);
@@ -459,7 +443,7 @@ var parseMetadata = metadata => {
         _generateLevels(rootLevel, totalLevels) {
             const levels = [];
 
-            for (let i = 0; i <= totalLevels; i++) {
+            for (let i = 1; i <= totalLevels; i++) {
                 const show = i >= rootLevel && i <= rootLevel + 2;
 
                 levels.push({
@@ -470,17 +454,12 @@ var parseMetadata = metadata => {
                     dataLabels: {
                         enabled: show
                     },
-                    ...(i === 1 
-                        ? { colorByPoint: true } 
-                        : i > 1
-                        ? {
-                            colorVariation: {
-                                key: 'brightness',
-                                to: 0.5
-                            }
+                    ...(i === 1 ? { colorByPoint: true } : {
+                        colorVariation: {
+                            key: 'brightness',
+                            to: 0.5
                         }
-                        : {} // For level 0, no color variation
-                    )
+                    })
                 });
             }
 
@@ -596,7 +575,7 @@ var parseMetadata = metadata => {
             console.log('Point clicked:', point);
 
             const name = point.name;
-            const path = point.id.replace(/^superRoot\//, '');
+            const path = point.id;
             const level = path.split('/').length - 1;
             const labels = path.split('/');
 
