@@ -412,7 +412,11 @@ var parseMetadata = metadata => {
                             enabled: true,
                             style: {
                                 fontWeight: 'normal'
-                            }
+                            },
+                            align: 'center',
+                            verticalAlign: 'middle',
+                            x: 0,
+                            y: 0,
                         }
                     }
                 },
@@ -541,6 +545,8 @@ var parseMetadata = metadata => {
                         enabled: show,
                         x: 0,
                         y: 0,
+                        align: 'center',
+                        verticalAlign: 'middle'
                     },
                     ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
