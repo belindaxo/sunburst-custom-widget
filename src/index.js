@@ -207,7 +207,7 @@ var parseMetadata = metadata => {
 
             const totalLevels = dimensions.length + 1;
 
-            const levels = this._generateLevels(0, totalLevels);
+            const levels = this._generateLevels(1, totalLevels);
             console.log('_generateLevels - Levels:', levels);
 
             const validCategoryNames = seriesData.filter(node => node.parent === 'Root').map(node => node.name) || [];
@@ -371,7 +371,7 @@ var parseMetadata = metadata => {
                                     console.log('point.events.click - rootId:', rootId);
                                     console.log('point.events.click - rootNode:', rootNode);
 
-                                    const rootLevel = rootNode?.level ?? 0;
+                                    const rootLevel = rootNode?.level ?? 1;
                                     console.log('point.events.click - New root level:', rootLevel);
 
                                     const newLevels = this._generateLevels(rootLevel, totalLevels);
@@ -410,7 +410,7 @@ var parseMetadata = metadata => {
                                 const chart = this._chart;
                                 const series = chart.series[0];
                                 const newLevel = button.newLevel;
-                                const rootLevel = newLevel ?? 0;
+                                const rootLevel = newLevel ?? 1;
                                 console.log('Breadcrumbs - New root level:', rootLevel);
                                 const newLevels = this._generateLevels(rootLevel, totalLevels);
                                 series.update({
@@ -463,14 +463,14 @@ var parseMetadata = metadata => {
 
             // Add Root Node level
             levels.push({
-                level: 0,
+                level: 1,
                 dataLabels: {
                     enabled: false
                 }
             });
 
-            // Add real data levels, starting from 
-            for (let i = 1; i <= totalLevels; i++) {
+            // Add real data levels, starting from 2
+            for (let i = 2; i <= totalLevels; i++) {
                 const show = i >= rootLevel && i <= rootLevel + 2;
 
                 levels.push({
@@ -481,7 +481,7 @@ var parseMetadata = metadata => {
                     dataLabels: {
                         enabled: show
                     },
-                    ...(i === 1 ? { colorByPoint: true } : {
+                    ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
                             key: 'brightness',
                             to: (i % 2 === 0 ? -0.5 : 0.5)
