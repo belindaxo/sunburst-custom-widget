@@ -436,7 +436,7 @@ var parseMetadata = metadata => {
                                 console.log('Breadcrumbs - button.newLevel: ', button.newLevel);
                                 const newLevel = breadcrumbs.level;
                                 console.log('Breadcrumbs - breadcrumbs.level:', newLevel);
-                                const rootLevel = newLevel ?? 1;
+                                const rootLevel = (newLevel === 0) ? 1 : newLevel;
                                 console.log('Breadcrumbs - New root level:', rootLevel);
                                 const newLevels = this._generateLevels(rootLevel, totalLevels);
                                 console.log('Breadcrumbs - New levels:', newLevels);
