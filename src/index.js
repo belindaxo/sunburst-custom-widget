@@ -434,9 +434,10 @@ var parseMetadata = metadata => {
                                 const chart = this._chart;
                                 const series = chart.series[0];
                                 const newLevel = button.newLevel;
-                                const rootLevel = newLevel;
+                                const rootLevel = newLevel ?? 1;
                                 console.log('Breadcrumbs - New root level:', rootLevel);
                                 const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                console.log('Breadcrumbs - New levels:', newLevels);
                                 series.update({
                                     levels: newLevels
                                 });
@@ -509,37 +510,33 @@ var parseMetadata = metadata => {
         _generateLevels(rootLevel, totalLevels) {
             const levels = [];
 
-            // Add data levels, starting from 1
-            for (let i = 1; i <= totalLevels; i++) {
+            // Add Root Node level
+            levels.push({
+                level: 1,
+                dataLabels: {
+                    enabled: false
+                }
+            });
+
+            // Add real data levels, starting from 2
+            for (let i = 2; i <= totalLevels; i++) {
                 const show = i >= rootLevel && i <= rootLevel + 2;
 
-                const baseLevel = {
+                levels.push({
                     level: i,
                     levelSize: {
                         value: show ? 1 : 0
                     },
                     dataLabels: {
-                        enabled: i === 1 ? false : show
-                    }
-                };
-
-                if (i === 2) {
-                    levels.push({
-                        ...baseLevel,
-                        colorByPoint: true
-                    });
-                } else if (i === 1) {
-                    levels.push(baseLevel); // Level for the root node
-                } else {
-                    levels.push({
-                        ...baseLevel,
+                        enabled: show
+                    },
+                    ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
                             key: 'brightness',
                             to: (i % 2 === 0 ? -0.5 : 0.5)
                         }
-                    });
-                }
-
+                    })
+                });
             }
 
             return levels;
