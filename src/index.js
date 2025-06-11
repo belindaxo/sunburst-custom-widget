@@ -362,22 +362,36 @@ var parseMetadata = metadata => {
                                 unselect: handlePointClick,
                                 click: (event) => {
                                     const clickedPoint = event.point;
-                                    if (clickedPoint.id === 'Root') {
-                                        console.log('point.events.click - Root node clicked, no action taken.');
-                                        return; // No action for root node click
-                                    }
-                                    console.log('point.events.click - point:', clickedPoint);
                                     const chart = clickedPoint.series.chart;
-                                    const rootId = chart.series[0].rootNode;
-                                    const rootNode = chart.series[0].nodeMap[rootId];
+                                    const series = chart.series[0];
+                                    const currentRootId = series.rootNode;
+                                    console.log('point.events.click drill up - Current Node ID:', currentRootId);
 
-                                    const rootLevel = rootNode?.level ?? 1;
-                                    console.log('point.events.click - New root level:', rootLevel);
+                                    // CASE 1: Drill up - clicking on the current center node
+                                    if (clickedPoint.id === currentRootId) {
+                                        const currentRootNode = series.nodeMap[currentRootId];
+                                        const parentNodeId = currentRootNode.parent;
+                                        console.log('point.events.click drill up - Parent Node ID:', parentNodeId);
+                                        
+                                        // Only drill up if parent exists
+                                        if (parentNodeId) {
+                                            const parentNode = series.nodeMap[parentNodeId];
+                                            const rootLevel = parentNode.level ?? 1; //fallback to level 1 (Root)
 
-                                    const newLevels = this._generateLevels(rootLevel, totalLevels);
-                                    chart.series[0].update({
-                                        levels: newLevels
-                                    });
+                                            const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                            series.setRootNode(parentNodeId);
+                                            series.update({ levels: newLevels });
+                                        }
+
+                                    // CASE 2: Drill down - clicking a child node
+                                    } else {
+                                        const clickedLevel = clickedPoint.node.level ?? 1; // Fallback to level 1 (Root)
+                                        console.log('point.events.click drill down - Clicked Level:', clickedLevel);
+
+                                        const newLevels = this._generateLevels(clickedLevel, totalLevels);
+                                        series.setRootNode(clickedPoint.id);
+                                        series.update({ levels: newLevels });
+                                    }
                                 }
                             },
                         },
