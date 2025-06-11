@@ -407,16 +407,6 @@ var parseMetadata = metadata => {
                                     linkedAnalysis.setFilters(selection);
                                 }
                             },
-                        },
-                        dataLabels: {
-                            enabled: true,
-                            style: {
-                                fontWeight: 'normal'
-                            },
-                            align: 'center',
-                            verticalAlign: 'middle',
-                            x: 0,
-                            y: 0,
                         }
                     }
                 },
@@ -543,10 +533,9 @@ var parseMetadata = metadata => {
                     },
                     dataLabels: {
                         enabled: show,
-                        x: 0,
-                        y: 0,
-                        align: 'center',
-                        verticalAlign: 'middle'
+                        style: {
+                            fontWeight: 'normal'
+                        },
                     },
                     ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
