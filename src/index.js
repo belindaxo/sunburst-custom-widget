@@ -204,7 +204,7 @@ var parseMetadata = metadata => {
             const autoTitle = `${seriesName} per ${dimPart}`;
             console.log('autoTitle:', autoTitle);
 
-            const totalLevels = dimensions.length;
+            const totalLevels = dimensions.length + 1;
 
             const levels = this._generateLevels(0, totalLevels);
             console.log('levels:', levels);
@@ -354,8 +354,14 @@ var parseMetadata = metadata => {
                                 select: handlePointClick,
                                 unselect: handlePointClick,
                                 click: (event) => {
-                                    console.log('Point clicked:', event.point);
-                                    const chart = event.point.series.chart;
+                                    const clickedPoint = event.point;
+                                    console.log('Point clicked:', clickedPoint);
+                                    if (clickedPoint.id === 'superRoot') {
+                                        console.log('Clicked super root — no drilldown');
+                                        return;
+                                    }
+
+                                    const chart = clickedPoint.series.chart;
                                     const rootId = chart.series[0].rootNode;
                                     const rootNode = chart.series[0].nodeMap[rootId];
                                     if (rootId === 'superRoot') {
