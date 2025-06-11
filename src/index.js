@@ -433,7 +433,9 @@ var parseMetadata = metadata => {
                                 console.log('Breadcrumbs object class:', breadcrumbs);
                                 const chart = this._chart;
                                 const series = chart.series[0];
-                                const newLevel = button.newLevel;
+                                console.log('Breadcrumbs - button.newLevel: ', button.newLevel);
+                                const newLevel = breadcrumbs.level;
+                                console.log('Breadcrumbs - breadcrumbs.level:', newLevel);
                                 const rootLevel = newLevel ?? 1;
                                 console.log('Breadcrumbs - New root level:', rootLevel);
                                 const newLevels = this._generateLevels(rootLevel, totalLevels);
