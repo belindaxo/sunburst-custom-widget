@@ -114,19 +114,29 @@ var parseMetadata = metadata => {
             const seriesData = [];
             const nodeMap = new Map();
 
+
+            seriesData.push({
+                id: 'superRoot',
+                parent: '',
+                name: measure.label,
+                color: '#004b8d'
+            });
+
             data.forEach(row => {
-                let parentId = '';
+                let parentId = 'superRoot';
                 let pathId = '';
 
                 dimensions.forEach((dim, level) => {
                     const value = row[dim.key].label || `Unknown-${level}`;
                     pathId += (pathId ? '/' : '') + value;
+                    const nodeId = `superRoot/${pathId}`;
 
                     if (!nodeMap.has(pathId)) {
                         nodeMap.set(pathId, true);
+
                         const node = {
-                            id: pathId,
-                            parent: level === 0 ? '' : parentId,
+                            id: nodeId,
+                            parent: parentId,
                             name: value,
                             description: dim.description || '',
                         };
@@ -139,7 +149,7 @@ var parseMetadata = metadata => {
                         seriesData.push(node);
                     }
 
-                    parentId = pathId; // Update parentId for the next level
+                    parentId = nodeId; // Update parentId for the next level
                 });
             });
 
@@ -199,7 +209,7 @@ var parseMetadata = metadata => {
             const levels = this._generateLevels(0, totalLevels);
             console.log('levels:', levels);
 
-            const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
+            const validCategoryNames = seriesData.filter(node => node.parent === 'superRoot').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
                 this._lastSentCategories = validCategoryNames;
@@ -348,6 +358,10 @@ var parseMetadata = metadata => {
                                     const chart = event.point.series.chart;
                                     const rootId = chart.series[0].rootNode;
                                     const rootNode = chart.series[0].nodeMap[rootId];
+                                    if (rootId === 'superRoot') {
+                                        console.log('Clicked super root — no drilldown');
+                                        return;
+                                    }
                                     const rootLevel = rootNode?.level ?? 0;
 
                                     console.log('New root level:', rootLevel);
@@ -417,7 +431,7 @@ var parseMetadata = metadata => {
                         },
                     },
                     true
-                ); 
+                );
             });
 
             container.addEventListener("mouseleave", () => {
@@ -460,30 +474,6 @@ var parseMetadata = metadata => {
             }
 
             return levels;
-        }
-
-        _updateVisibleLevels(rootLevel, totalLevels) {
-            const chart = this._chart;
-            if (!chart || !chart.series || !chart.series[0]) {
-                return;
-            }
-
-            const levels = chart.series[0].options.levels.map(level => {
-                const show = level.level > rootLevel && level.level <= rootLevel + 2;
-
-                return {
-                    ...level,
-                    levelSize: {
-                        value: show ? 1 : 0
-                    },
-                    dataLabels: {
-                        ...(level.dataLabels || {}),
-                        enabled: show
-                    }
-                };
-            });
-
-            chart.series[0].update({ levels });
         }
 
         /**
@@ -595,7 +585,7 @@ var parseMetadata = metadata => {
             console.log('Point clicked:', point);
 
             const name = point.name;
-            const path = point.id;
+            const path = point.id.replace(/^superRoot\//, '');
             const level = path.split('/').length - 1;
             const labels = path.split('/');
 
