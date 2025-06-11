@@ -113,9 +113,10 @@ var parseMetadata = metadata => {
         _processSeriesData(data, dimensions, measure) {
             const seriesData = [];
             const nodeMap = new Map();
+            let total = 0;
 
             data.forEach(row => {
-                let parentId = '';
+                let parentId = 'Root'; // Start with a root parent ID
                 let pathId = '';
 
                 dimensions.forEach((dim, level) => {
@@ -134,7 +135,9 @@ var parseMetadata = metadata => {
 
                         // Assign value only on the leaf level
                         if (level === dimensions.length - 1) {
-                            node.value = row[measure.key].raw ?? 0; // Default to 0 if raw value is undefined
+                            const val = row[measure.key].raw ?? 0;
+                            node.value = val;
+                            total += val; // Accumulate total value
                         }
 
                         seriesData.push(node);
@@ -144,6 +147,16 @@ var parseMetadata = metadata => {
                 });
             });
 
+            const rootNode = {
+                id: 'Root',
+                parent: '',
+                name: measure.label || 'Root',
+                description: '',
+                value: total, // Set the total value for the root node
+            };
+
+            // Add the root node to the series data
+            seriesData.unshift(rootNode);
             return seriesData;
         }
 
@@ -179,7 +192,7 @@ var parseMetadata = metadata => {
             const [measure] = measures;
 
             const seriesData = this._processSeriesData(data, dimensions, measure);
-            console.log('seriesData:', seriesData);
+            console.log('_processSeriesData - seriesData:', seriesData);
 
             const seriesName = measures[0]?.label || 'Value';
 
@@ -187,20 +200,17 @@ var parseMetadata = metadata => {
                 const dimDescription = dim.description || 'Dimension Description';
                 return dimDescription;
             });
-            console.log('dimDescriptions:', dimDescriptions);
 
             const dimPart = dimDescriptions.join(', ');
-            console.log('dimPart:', dimPart);
 
             const autoTitle = `${seriesName} per ${dimPart}`;
-            console.log('autoTitle:', autoTitle);
 
-            const totalLevels = dimensions.length;
+            const totalLevels = dimensions.length + 1;
 
-            const levels = this._generateLevels(0, totalLevels);
-            console.log('levels:', levels);
+            const levels = this._generateLevels(1, totalLevels);
+            console.log('_generateLevels - Levels:', levels);
 
-            const validCategoryNames = seriesData.filter(node => node.parent === '').map(node => node.name) || [];
+            const validCategoryNames = seriesData.filter(node => node.parent === 'Root').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
             if (JSON.stringify(this._lastSentCategories) !== JSON.stringify(validCategoryNames)) {
                 this._lastSentCategories = validCategoryNames;
@@ -247,7 +257,11 @@ var parseMetadata = metadata => {
             const customColors = this.customColors || [];
 
             seriesData.forEach(node => {
-                if (node.parent === '') {
+                if (node.id === 'Root') {
+                    node.color = '#ffffff'; // Root node color
+                    return;
+                }
+                if (node.parent === 'Root') {
                     const colorEntry = customColors.find(c => c.category === node.name);
                     if (colorEntry && colorEntry.color) {
                         node.color = colorEntry.color;
@@ -259,7 +273,7 @@ var parseMetadata = metadata => {
                 }
             });
 
-            console.log('seriesData with colors:', seriesData);
+            console.log('seriesData with colors added:', seriesData);
 
             Highcharts.SVGRenderer.prototype.symbols.contextButton = function (x, y, w, h) {
                 const radius = w * 0.11;
@@ -330,6 +344,8 @@ var parseMetadata = metadata => {
                                         this._selectedPoint.select(false, false);
                                         this._selectedPoint = null;
                                     }
+                                    console.log('Reset filters - selectedPoint:', this._selectedPoint);
+                                    console.log('Reset filters - linkedAnalysis:', linkedAnalysis);
                                 }
                             }
 
@@ -346,15 +362,14 @@ var parseMetadata = metadata => {
                                 unselect: handlePointClick,
                                 click: (event) => {
                                     const clickedPoint = event.point;
-                                    console.log('Point clicked:', clickedPoint);
-
+                                    console.log('Point click event - point:', clickedPoint);
                                     const chart = clickedPoint.series.chart;
                                     const rootId = chart.series[0].rootNode;
                                     const rootNode = chart.series[0].nodeMap[rootId];
-                                    
+
                                     const rootLevel = rootNode?.level ?? 0;
 
-                                    console.log('New root level:', rootLevel);
+                                    console.log('Point click event - New root level:', rootLevel);
 
                                     const newLevels = this._generateLevels(rootLevel, totalLevels);
                                     chart.series[0].update({
@@ -392,8 +407,8 @@ var parseMetadata = metadata => {
                                 const chart = this._chart;
                                 const series = chart.series[0];
                                 const newLevel = button.newLevel;
-                                const rootLevel = newLevel ?? 0;
-                                console.log('New root level:', rootLevel);
+                                const rootLevel = newLevel ?? 1;
+                                console.log('Breadcrumbs - New root level:', rootLevel);
                                 const newLevels = this._generateLevels(rootLevel, totalLevels);
                                 series.update({
                                     levels: newLevels
@@ -443,7 +458,20 @@ var parseMetadata = metadata => {
         _generateLevels(rootLevel, totalLevels) {
             const levels = [];
 
-            for (let i = 1; i <= totalLevels; i++) {
+            // Add Root Node level
+            levels.push({
+                level: 1,
+                dataLabels: {
+                    filter: {
+                        property: 'outerArcLength',
+                        operator: '>',
+                        value: 64
+                    }
+                }
+            });
+
+            // Add real data levels, starting from 2
+            for (let i = 2; i <= totalLevels; i++) {
                 const show = i >= rootLevel && i <= rootLevel + 2;
 
                 levels.push({
@@ -454,10 +482,10 @@ var parseMetadata = metadata => {
                     dataLabels: {
                         enabled: show
                     },
-                    ...(i === 1 ? { colorByPoint: true } : {
+                    ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
                             key: 'brightness',
-                            to: 0.5
+                            to: (i % 2 === 0 ? -0.5 : 0.5)
                         }
                     })
                 });
@@ -539,7 +567,6 @@ var parseMetadata = metadata => {
          */
         _formatTooltip(scaleFormat) {
             return function () {
-                console.log(this);
                 if (this.point) {
                     // Retrieve the category data using the index
                     const name = this.point.name;
@@ -572,27 +599,27 @@ var parseMetadata = metadata => {
             if (!point) {
                 return;
             }
-            console.log('Point clicked:', point);
+            console.log('_handlePointClick - point clicked:', point);
 
             const name = point.name;
             const path = point.id;
             const level = path.split('/').length - 1;
             const labels = path.split('/');
 
-            console.log('Path:', path);
-            console.log('Level:', level);
-            console.log('Labels:', labels);
+            console.log('_handlePointClick - Path:', path);
+            console.log('_handlePointClick - Level:', level);
+            console.log('_handlePointClick - Labels:', labels);
 
             const dimension = dimensions[level];
             if (!dimension) {
-                console.log('No dimension found for level:', level);
+                console.log('_handlePointClick - No dimension found for level:', level);
                 return;
             }
 
             const dimensionKey = dimension.key;
-            console.log('Dimension Key:', dimensionKey);
+            console.log('_handlePointClick - Dimension Key:', dimensionKey);
             const dimensionId = dimension.id;
-            console.log('Dimension ID:', dimensionId);
+            console.log('_handlePointClick - Dimension ID:', dimensionId);
             const label = name;
 
             const selectedItem = dataBinding.data.find((item) => item[dimensionKey]?.label === label);
@@ -601,9 +628,11 @@ var parseMetadata = metadata => {
 
             // Deselect previously selected point
             if (this._selectedPoint && this._selectedPoint !== point) {
+                console.log('_handlePointClick - Deselecting previously selected point:', this._selectedPoint);
                 linkedAnalysis.removeFilters();
                 this._selectedPoint.select(false, false);
                 this._selectedPoint = null;
+                console.log('_handlePointClick - Deselect complete. Selected Point:', this._selectedPoint);
             }
 
             if (event.type === 'select') {
@@ -618,10 +647,18 @@ var parseMetadata = metadata => {
 
                     linkedAnalysis.setFilters(selection);
                     this._selectedPoint = point;
+
+                    console.log('_handlePointClick select - Selection:', selection);
+                    console.log('_handlePointClick select - Selected Point:', this._selectedPoint);
+                    console.log('_handlePointClick select - Linked Analysis:', linkedAnalysis);
                 }
             } else if (event.type === 'unselect') {
                 linkedAnalysis.removeFilters();
                 this._selectedPoint = null;
+
+                console.log('_handlePointClick unselect - Selected Point:', this._selectedPoint);
+                console.log('_handlePointClick unselect - Linked Analysis:', linkedAnalysis);
+
             }
         }
     }
