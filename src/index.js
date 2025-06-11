@@ -471,7 +471,7 @@ var parseMetadata = metadata => {
                         value: show ? 1 : 0
                     },
                     dataLabels: {
-                        enabled: show
+                        enabled: i === 1 ? false : show
                     }
                 };
 
@@ -481,12 +481,7 @@ var parseMetadata = metadata => {
                         colorByPoint: true
                     });
                 } else if (i === 1) {
-                    levels.push({
-                        ...baseLevel,
-                        dataLabels: {
-                            enabled: false
-                        }
-                    });
+                    levels.push(baseLevel); // Level for the root node
                 } else {
                     levels.push({
                         ...baseLevel,
