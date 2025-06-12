@@ -343,8 +343,7 @@ var parseMetadata = metadata => {
                                         this._selectedPoint.select(false, false);
                                         this._selectedPoint = null;
                                     }
-                                    console.log('Reset filters - selectedPoint:', this._selectedPoint);
-                                    console.log('Reset filters - linkedAnalysis:', linkedAnalysis);
+                                    this._generateLevels(1, totalLevels);
                                 }
                             }
 
@@ -550,8 +549,7 @@ var parseMetadata = metadata => {
                         enabled: show,
                         style: {
                             fontWeight: 'normal'
-                        },
-                        overflow: 'allow'
+                        }
                     },
                     ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
