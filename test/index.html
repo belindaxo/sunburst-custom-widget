@@ -1,22 +1,191 @@
 >
 <!DOCTYPE html>
-
 <html>
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title></title>
-    <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="">
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/sunburst.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
-
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 </head>
 
 <body>
+    <script>
+        class MyCustomElement extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+
+                this.levels = [];
+                this.data = [];
+
+                const sheet = new CSSStyleSheet();
+                sheet.replaceSync(`
+                    #parent-container {
+                        width: 700px;
+                        height: 500px;
+                        margin: 0 auto;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                    #container {
+                        width: 100%;
+                        height: 100%;
+                    }
+                `);
+
+                this.shadowRoot.adoptedStyleSheets = [sheet];
+
+                this.shadowRoot.innerHTML = `
+                    <div id="parent-container">
+                        <div id="container"></div>
+                    </div>
+                `;
+
+                this._renderChart();
+            }
+
+            _renderChart() {
+                const container = this.shadowRoot.querySelector('#container');
+
+                this.data = [
+                    {
+                        id: '0.0',
+                        name: '2024 YTD',
+                        parent: ''
+                    },
+                    {
+                        id: '1.1',
+                        name: 'Process & Infrastructure',
+                        parent: '0.0'
+                    },
+                    {
+                        id: '1.2',
+                        name: 'Oil & Gas',
+                        parent: '0.0'
+                    },
+                    {
+                        id: '1.3',
+                        name: 'Oil Sands',
+                        parent: '0.0'
+                    },
+                    {
+                        id: '2.1',
+                        name: 'Industry X',
+                        parent: '1.1',
+                        value: 1000000
+                    },
+                    {
+                        id: '2.2',
+                        name: 'Industry Y',
+                        parent: '1.1',
+                        value: 2500000
+                    },
+                    {
+                        id: '2.3',
+                        name: 'Industry Z',
+                        parent: '1.2',
+                        value: 4750000
+                    },
+                    {
+                        id: '2.4',
+                        name: 'Industry U',
+                        parent: '1.2',
+                        value: 3000000
+                    },
+                    {
+                        id: '2.4',
+                        name: 'Industry W',
+                        parent: '1.3',
+                        value: 2000000
+                    },
+                    {
+                        id: '2.5',
+                        name: 'Industry V',
+                        parent: '1.3',
+                        value: 7000000
+                    }
+                ];
+
+                this.levels = [
+                    {
+                        level: 1,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.name}',
+                        }
+                    },
+                    {
+                        level: 2,
+                        colorByPoint: true,
+                        dataLabels: {
+                            enabled: true,
+                            overflow: 'allow',
+                            crop: false,
+
+                        }
+                    },
+                    {
+                        level: 3,
+                        colorVariation: {
+                            key: 'brightness',
+                            to: -0.5
+                        },
+                    }
+                ];
+
+                console.log('Data:', this.data);
+                console.log('Levels:', this.levels);
+
+                Highcharts.getOptions().colors.splice(0, 0, 'transparent');
+
+                Highcharts.chart(container, {
+                    chart: {
+                        type: 'sunburst'
+                    },
+                    title: {
+                        text: '2024 YTD per Customer Segment, Industry',
+                        align: 'left',
+                        style: {
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            color: '#004B8D'
+                        }
+                    },
+                    subtitle: {
+                        text: 'in m',
+                        align: 'left',
+                        style: {
+                            fontSize: '11px',
+                            fontStyle: 'normal',
+                            color: '#000000'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    exporting: {
+                        enabled: true
+                    },
+                    series: [{
+                        type: 'sunburst',
+                        name: '2024 YTD',
+                        data: this.data,
+                        allowTraversingTree: true,
+                        levels: this.levels,
+                    }]
+                });
+            }
+        }
+        customElements.define('my-custom-element', MyCustomElement);
+    </script>
+    <my-custom-element></my-custom-element>
     <form id="form">
         <legend style="font-weight: bold;font-size: 18px;"> Font </legend>
         <table>

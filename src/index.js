@@ -383,6 +383,24 @@ var parseMetadata = metadata => {
                                     const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
                                     if (!linkedAnalysis) return;
 
+                                    if (clickedPoint.node.isLeaf) {
+                                        console.log('point.events.click - Leaf node clicked:', clickedPoint.name);
+                                        const labels = clickedPoint.id.split('/');
+                                        const selection = {};
+                                        labels.forEach((label, index) => {
+                                            const dim = dimensions[index];
+                                            const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                            if (dim && matchingRow) {
+                                                selection[dim.id] = matchingRow[dim.key].id;
+                                            }
+                                        });
+
+                                        linkedAnalysis.removeFilters();
+                                        console.log('point.events.click - Leaf Selection:', selection);
+                                        linkedAnalysis.setFilters(selection);
+                                        return;
+                                    }
+
                                     if (rootLevel === 1) {
                                         console.log('point.events.click - Removing filters for root level');
                                         linkedAnalysis.removeFilters();
