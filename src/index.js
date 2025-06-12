@@ -223,7 +223,6 @@ var parseMetadata = metadata => {
                 }));
             }
 
-            const handlePointClick = (event) => this._handlePointClick(event, dataBinding, dimensions);
             const scaleFormat = (value) => this._scaleFormat(value);
             const subtitleText = this._updateSubtitle();
             const titleText = this._updateTitle(autoTitle);
@@ -358,8 +357,6 @@ var parseMetadata = metadata => {
                         allowPointSelect: true,
                         point: {
                             events: {
-                                // select: handlePointClick,
-                                // unselect: handlePointClick,
                                 click: (event) => {
                                     const clickedPoint = event.point;
                                     console.log('point.events.click - clickedPoint:', clickedPoint);
@@ -674,74 +671,6 @@ var parseMetadata = metadata => {
                     return 'error with data';
                 }
             };
-        }
-
-        _handlePointClick(event, dataBinding, dimensions) {
-            const point = event.target;
-            if (!point) {
-                return;
-            }
-            // console.log('_handlePointClick - point clicked:', point);
-
-            const name = point.name;
-            const path = point.id;
-            const level = path.split('/').length - 1;
-            const labels = path.split('/');
-
-            // console.log('_handlePointClick - Path:', path);
-            // console.log('_handlePointClick - Level:', level);
-            // console.log('_handlePointClick - Labels:', labels);
-
-            const dimension = dimensions[level];
-            if (!dimension) {
-                console.log('_handlePointClick - No dimension found for level:', level);
-                return;
-            }
-
-            const dimensionKey = dimension.key;
-            console.log('_handlePointClick - Dimension Key:', dimensionKey);
-            const dimensionId = dimension.id;
-            console.log('_handlePointClick - Dimension ID:', dimensionId);
-            const label = name;
-
-            const selectedItem = dataBinding.data.find((item) => item[dimensionKey]?.label === label);
-
-            const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
-
-            // Deselect previously selected point
-            if (this._selectedPoint && this._selectedPoint !== point) {
-                // console.log('_handlePointClick - Deselecting previously selected point:', this._selectedPoint);
-                linkedAnalysis.removeFilters();
-                this._selectedPoint.select(false, false);
-                this._selectedPoint = null;
-                // console.log('_handlePointClick - Deselect complete. Selected Point:', this._selectedPoint);
-            }
-
-            if (event.type === 'select') {
-                if (selectedItem) {
-                    const selection = {};
-                    labels.forEach((label, index) => {
-                        const dim = dimensions[index];
-                        if (dim && selectedItem[dim.key]) {
-                            selection[dim.id] = selectedItem[dim.key].id;
-                        }
-                    });
-
-                    linkedAnalysis.setFilters(selection);
-                    this._selectedPoint = point;
-
-                    // console.log('_handlePointClick select - Selection:', selection);
-                    // console.log('_handlePointClick select - Selected Point:', this._selectedPoint);
-                    // console.log('_handlePointClick select - Linked Analysis:', linkedAnalysis);
-                }
-            } else if (event.type === 'unselect') {
-                linkedAnalysis.removeFilters();
-                this._selectedPoint = null;
-
-                // console.log('_handlePointClick unselect - Selected Point:', this._selectedPoint);
-                // console.log('_handlePointClick unselect - Linked Analysis:', linkedAnalysis);
-
-            }
         }
     }
     customElements.define('com-sap-sample-sunburst', Sunburst);
