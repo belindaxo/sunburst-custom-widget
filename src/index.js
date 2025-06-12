@@ -2,6 +2,7 @@ import * as Highcharts from 'highcharts';
 import 'highcharts/modules/sunburst.js';
 import 'highcharts/modules/exporting';
 import 'highcharts/modules/drilldown';
+import 'highcharts/modules/export-data';
 
 /**
  * Parses metadata into structured dimensions and measures.
@@ -343,10 +344,21 @@ var parseMetadata = metadata => {
                                         this._selectedPoint.select(false, false);
                                         this._selectedPoint = null;
                                     }
-                                    this._generateLevels(1, totalLevels);
+                                    const newLevels = this._generateLevels(1, totalLevels);
+                                    this._chart.series[0].update({
+                                        levels: newLevels
+                                    });
                                 }
                             }
 
+                        },
+                        downloadCSV: {
+                            text: 'Download CSV',
+                            onclick: () => {
+                                const csvString = this._chart.getCSV();
+                                console.log('CSV String:', csvString);
+                                this._chart.downloadCSV();
+                            }
                         }
                     }
                 },
@@ -404,8 +416,8 @@ var parseMetadata = metadata => {
                                     }
 
                                     // Remove existing filters before applying new ones
-                                    console.log('point.events.click - Removing existing filters');
-                                    linkedAnalysis.removeFilters();
+                                    // console.log('point.events.click - Removing existing filters');
+                                    // linkedAnalysis.removeFilters();
 
                                     const labels = rootId.split('/');
                                     const selection = {};
@@ -500,7 +512,7 @@ var parseMetadata = metadata => {
                                 contextButton: {
                                     enabled: true,
                                     symbol: 'contextButton',
-                                    menuItems: ['resetFilters']
+                                    menuItems: ['resetFilters', "downloadCSV"]
                                 },
                             },
                         },
