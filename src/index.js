@@ -536,6 +536,7 @@ var parseMetadata = metadata => {
                         style: {
                             fontWeight: 'normal'
                         },
+                        overflow: 'allow'
                     },
                     ...(i === 2 ? { colorByPoint: true } : {
                         colorVariation: {
