@@ -340,15 +340,9 @@ var parseMetadata = metadata => {
                                 const linkedAnalysis = this.dataBindings.getDataBinding('dataBinding').getLinkedAnalysis();
                                 if (linkedAnalysis) {
                                     linkedAnalysis.removeFilters();
-                                    if (this._selectedPoint) {
-                                        this._selectedPoint.select(false, false);
-                                        this._selectedPoint = null;
-                                    }
-                                    const newLevels = this._generateLevels(1, totalLevels);
-                                    this._chart.series[0].update({
-                                        levels: newLevels
-                                    });
                                 }
+                                this._selectedPoint = null;
+                                this._renderChart(); // Re-render the chart to reset the state
                             }
 
                         },
