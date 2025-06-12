@@ -344,15 +344,6 @@ var parseMetadata = metadata => {
                                 this._selectedPoint = null;
                                 this._renderChart(); // Re-render the chart to reset the state
                             }
-
-                        },
-                        downloadCSV: {
-                            text: 'Download CSV',
-                            onclick: () => {
-                                const csvString = this._chart.getCSV();
-                                console.log('CSV String:', csvString);
-                                this._chart.downloadCSV();
-                            }
                         }
                     }
                 },
@@ -506,7 +497,7 @@ var parseMetadata = metadata => {
                                 contextButton: {
                                     enabled: true,
                                     symbol: 'contextButton',
-                                    menuItems: ['resetFilters', "downloadCSV"]
+                                    menuItems: ['resetFilters']
                                 },
                             },
                         },
