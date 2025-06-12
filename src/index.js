@@ -395,7 +395,7 @@ var parseMetadata = metadata => {
                                             }
                                         });
 
-                                        linkedAnalysis.removeFilters();
+                                        // linkedAnalysis.removeFilters();
                                         console.log('point.events.click - Leaf Selection:', selection);
                                         linkedAnalysis.setFilters(selection);
                                         return;
