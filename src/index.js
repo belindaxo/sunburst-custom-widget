@@ -668,10 +668,23 @@ var parseMetadata = metadata => {
             };
         }
 
-        getSunburstMembers(feed) {
+        getSunburstMembers() {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
-            const members = dataBinding.getMembers(feed);
+            const members = dataBinding.getMembers('measures');
             return members;
+        }
+
+        getSunburstDimensions() {
+            const dataBinding = this.dataBindings.getDataBinding('dataBinding');
+            const dimensions = dataBinding.getDimensions('dimensions');
+            return dimensions;
+        }
+
+        removeSunburstMember(memberId) {
+            const dataBinding = this.dataBindings.getDataBinding('dataBinding');
+            dataBinding.removeMember(memberId);
+            console.log('removeSunburstMember - memberId:', memberId);
+            this._renderChart();
         }
 
     }

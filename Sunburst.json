@@ -106,15 +106,22 @@
     },
     "methods": {
         "getSunburstMembers": {
+            "description": "Returns the members of the specified feed of the sunburst chart.",
+            "returnType": "string[]"
+        },
+        "getSunburstDimensions": {
+            "description": "Returns the dimensions of the sunburst chart.",
+            "returnType": "string[]"
+        },
+        "removeSunburstMember": {
+            "description": "Removes a member from the sunburst chart.",
             "parameters": [
                 {
-                    "name": "feed",
+                    "name": "memberId",
                     "type": "string",
-                    "description": "The feed ID to get the members from."
+                    "description": "The ID of the member to remove."
                 }
-            ],
-            "description": "Returns the members of the specified feed for the sunburst chart.",
-            "returnType": "string[]"
+            ]
         }
     },
     "events": {
