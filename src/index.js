@@ -668,11 +668,12 @@ var parseMetadata = metadata => {
             };
         }
 
-        getSunburstMeasures() {
+        getSunburstMembers(feed) {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
-            const measures = dataBinding.getMembers('measures');
-            return measures;
+            const members = dataBinding.getMembers(feed);
+            return members;
         }
+
     }
     customElements.define('com-sap-sample-sunburst', Sunburst);
 })();

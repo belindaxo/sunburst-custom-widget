@@ -105,8 +105,15 @@
         }
     },
     "methods": {
-        "getSunburstMeasures": {
-            "description": "Returns the measures for the sunburst chart.",
+        "getSunburstMembers": {
+            "parameters": [
+                {
+                    "name": "feed",
+                    "type": "string",
+                    "description": "The feed ID to get the members from."
+                }
+            ],
+            "description": "Returns the members of the specified feed for the sunburst chart.",
             "returnType": "string[]"
         }
     },
