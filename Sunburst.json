@@ -105,7 +105,10 @@
         }
     },
     "methods": {
-
+        "getSunburstMeasures": {
+            "description": "Returns the measures for the sunburst chart.",
+            "returnType": "string[]"
+        }
     },
     "events": {
 

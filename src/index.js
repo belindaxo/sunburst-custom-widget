@@ -667,6 +667,12 @@ var parseMetadata = metadata => {
                 }
             };
         }
+
+        getSunburstMeasures() {
+            const dataBinding = this.dataBindings.getDataBinding('dataBinding');
+            const measures = dataBinding.getMembers('measures');
+            return measures;
+        }
     }
     customElements.define('com-sap-sample-sunburst', Sunburst);
 })();
