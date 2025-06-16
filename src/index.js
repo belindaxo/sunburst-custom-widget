@@ -490,35 +490,39 @@ var parseMetadata = metadata => {
             const container = this.shadowRoot.getElementById('container');
 
             container.addEventListener("mouseenter", () => {
-                this._chart.update(
-                    {
-                        exporting: {
-                            buttons: {
-                                contextButton: {
-                                    enabled: true,
-                                    symbol: 'contextButton',
-                                    menuItems: ['resetFilters']
+                if (this._chart) {
+                    this._chart.update(
+                        {
+                            exporting: {
+                                buttons: {
+                                    contextButton: {
+                                        enabled: true,
+                                        symbol: 'contextButton',
+                                        menuItems: ['resetFilters']
+                                    },
                                 },
                             },
                         },
-                    },
-                    true
-                );
+                        true
+                    );
+                }
             });
 
             container.addEventListener("mouseleave", () => {
-                this._chart.update(
-                    {
-                        exporting: {
-                            buttons: {
-                                contextButton: {
-                                    enabled: false,
+                if (this._chart) {
+                    this._chart.update(
+                        {
+                            exporting: {
+                                buttons: {
+                                    contextButton: {
+                                        enabled: false,
+                                    },
                                 },
                             },
                         },
-                    },
-                    true
-                );
+                        true
+                    );
+                }
             });
         }
 
