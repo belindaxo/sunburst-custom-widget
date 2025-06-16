@@ -122,6 +122,16 @@
                     "description": "The ID of the member to remove."
                 }
             ]
+        },
+        "addSunburstMember": {
+            "description": "Adds the specified member to the sunburst chart.",
+            "parameters": [
+                {
+                    "name": "memberId",
+                    "type": "string",
+                    "description": "The ID of the member to add."
+                }
+            ]
         }
     },
     "events": {

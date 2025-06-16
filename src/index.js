@@ -687,6 +687,20 @@ var parseMetadata = metadata => {
             this._renderChart();
         }
 
+        removeSunburstDimension(dimensionId) {
+            const dataBinding = this.dataBindings.getDataBinding('dataBinding');
+            dataBinding.removeDimension(dimensionId);
+            console.log('removeSunburstDimension - dimensionId:', dimensionId);
+            this._renderChart();
+        }
+
+        addSunburstMember(memberId) {
+            const dataBinding = this.dataBindings.getDataBinding('dataBinding');
+            dataBinding.addMemberToFeed('measures', memberId);
+            console.log('addSunburstMember - memberId:', memberId);
+            this._renderChart();
+        }
+
     }
     customElements.define('com-sap-sample-sunburst', Sunburst);
 })();
