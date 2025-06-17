@@ -142,6 +142,16 @@
                     "description": "The ID of the member to add."
                 }
             ]
+        },
+        "addSunburstDimension": {
+            "description": "Adds the specified dimension to the sunburst chart.",
+            "parameters": [
+                {
+                    "name": "dimensionId",
+                    "type": "string",
+                    "description": "The ID of the dimension to add."
+                }
+            ]
         }
     },
     "events": {

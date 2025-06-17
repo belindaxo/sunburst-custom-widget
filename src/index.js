@@ -705,6 +705,13 @@ var parseMetadata = metadata => {
             this._renderChart();
         }
 
+        addSunburstDimension(dimensionId) {
+            const dataBinding = this.dataBindings.getDataBinding('dataBinding');
+            dataBinding.addDimensionToFeed('dimensions', dimensionId);
+            console.log('addSunburstDimension - dimensionId:', dimensionId);
+            this._renderChart();
+        }
+
     }
     customElements.define('com-sap-sample-sunburst', Sunburst);
 })();
