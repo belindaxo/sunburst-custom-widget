@@ -688,28 +688,24 @@ var parseMetadata = metadata => {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
             dataBinding.removeMember(memberId);
             console.log('removeSunburstMember - memberId:', memberId);
-            this._renderChart();
         }
 
         removeSunburstDimension(dimensionId) {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
             dataBinding.removeDimension(dimensionId);
             console.log('removeSunburstDimension - dimensionId:', dimensionId);
-            this._renderChart();
         }
 
         addSunburstMember(memberId) {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
             dataBinding.addMemberToFeed('measures', memberId);
             console.log('addSunburstMember - memberId:', memberId);
-            this._renderChart();
         }
 
         addSunburstDimension(dimensionId) {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
             dataBinding.addDimensionToFeed('dimensions', dimensionId);
             console.log('addSunburstDimension - dimensionId:', dimensionId);
-            this._renderChart();
         }
 
     }
