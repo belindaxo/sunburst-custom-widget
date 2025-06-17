@@ -123,6 +123,16 @@
                 }
             ]
         },
+        "removeSunburstDimension": {
+            "description": "Removes a dimension from the sunburst chart.",
+            "parameters": [
+                {
+                    "name": "dimensionId",
+                    "type": "string",
+                    "description": "The ID of the dimension to remove."
+                }
+            ]
+        },
         "addSunburstMember": {
             "description": "Adds the specified member to the sunburst chart.",
             "parameters": [
