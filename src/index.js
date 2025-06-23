@@ -341,7 +341,10 @@ var parseMetadata = metadata => {
                                 if (linkedAnalysis) {
                                     linkedAnalysis.removeFilters();
                                 }
-                                this._selectedPoint = null;
+                                if (this._selectedPoint) {
+                                    this._selectedPoint.select(false, false);
+                                    this._selectedPoint = null;
+                                }
                                 this._renderChart(); // Re-render the chart to reset the state
                             }
                         }
@@ -378,6 +381,14 @@ var parseMetadata = metadata => {
 
                                     if (clickedPoint.node.isLeaf) {
                                         console.log('point.events.click - Leaf node clicked:', clickedPoint.name);
+
+                                        if (this._selectedPoint && this._selectedPoint !== clickedPoint) {
+                                            console.log('point.events.click - Deselecting previous point:', this._selectedPoint.name);
+                                            this._selectedPoint.select(false, false);
+                                        }
+                                        clickedPoint.select(true, false);
+                                        this._selectedPoint = clickedPoint;
+
                                         const labels = clickedPoint.id.split('/');
                                         const selection = {};
                                         labels.forEach((label, index) => {
