@@ -41,6 +41,12 @@ export function updateTitle(autoTitle, chartTitle) {
     }
 }
 
+/**
+ * Generates level configurations for the bubble chart based on the root level and total levels.
+ * @param {number} rootLevel - The level of the root node in the hierarchy.
+ * @param {number} totalLevels - The total number of levels in the hierarchy.
+ * @returns {Array} An array of level configurations for the bubble chart.
+ */
 export function generateLevels(rootLevel, totalLevels) {
     const levels = [];
 

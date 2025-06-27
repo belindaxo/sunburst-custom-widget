@@ -1,4 +1,10 @@
-
+/**
+ * Scales a numeric value based on the specified scale format.
+ * @param {number} value 
+ * @param {string} scaleFormat 
+ * @param {number} decimalPlaces 
+ * @returns {Object} An object containing the scaled value and its suffix.
+ */
 export function scaleValue(value, scaleFormat, decimalPlaces) {
     let scaled = value;
     let suffix = '';

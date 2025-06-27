@@ -234,13 +234,10 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                 click: (event) => {
                                     const clickedPoint = event.point;
                                     console.log('point.events.click - clickedPoint:', clickedPoint);
-                                    console.log('point.events.click - clickedPoint.id:', clickedPoint.id);
                                     const chart = clickedPoint.series.chart;
                                     const series = chart.series[0];
                                     const rootId = series.rootNode;
                                     const rootNode = series.nodeMap[rootId];
-                                    console.log('point.events.click - rootId:', rootId);
-                                    console.log('point.events.click - rootNode:', rootNode);
 
                                     const rootLevel = (rootNode?.id === '') ? 1 : (rootNode.level);
                                     console.log('point.events.click - New root level:', rootLevel);
@@ -258,7 +255,6 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                         console.log('point.events.click - Leaf node clicked:', clickedPoint.name);
 
                                         if (this._selectedPoint && this._selectedPoint !== clickedPoint) {
-                                            console.log('point.events.click - Deselecting previous point:', this._selectedPoint.name);
                                             this._selectedPoint.select(false, false);
                                         }
                                         clickedPoint.select(true, false);
@@ -281,14 +277,9 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                     }
 
                                     if (rootLevel === 1) {
-                                        console.log('point.events.click - Removing filters for root level');
                                         linkedAnalysis.removeFilters();
                                         return;
                                     }
-
-                                    // Remove existing filters before applying new ones
-                                    // console.log('point.events.click - Removing existing filters');
-                                    // linkedAnalysis.removeFilters();
 
                                     const labels = rootId.split('/');
                                     const selection = {};
@@ -328,7 +319,6 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                 const chart = this._chart;
                                 const series = chart.series[0];
                                 const newLevel = breadcrumbs.level;
-                                console.log('Breadcrumbs - breadcrumbs.level:', newLevel);
                                 const rootLevel = (newLevel === 0) ? 1 : newLevel;
                                 console.log('Breadcrumbs - New root level:', rootLevel);
                                 const newLevels = generateLevels(rootLevel, totalLevels);
@@ -344,13 +334,11 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                 if (!linkedAnalysis) return;
 
                                 if (rootLevel === 1) {
-                                    console.log('Breadcrumbs - Removing filters for root level');
                                     linkedAnalysis.removeFilters();
                                     return;
                                 }
 
                                 // Remove existing filters before applying new ones
-                                console.log('Breadcrumbs - Removing existing filters');
                                 linkedAnalysis.removeFilters();
 
                                 const labels = rootId.split('/');
@@ -412,43 +400,7 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
             });
         }
 
-        // _generateLevels(rootLevel, totalLevels) {
-        //     const levels = [];
-
-        //     // Add Root Node level
-        //     levels.push({
-        //         level: 1,
-        //         dataLabels: {
-        //             enabled: false
-        //         }
-        //     });
-
-        //     // Add real data levels, starting from 2
-        //     for (let i = 2; i <= totalLevels; i++) {
-        //         const show = i >= rootLevel && i <= rootLevel + 2;
-
-        //         levels.push({
-        //             level: i,
-        //             levelSize: {
-        //                 value: show ? 1 : 0
-        //             },
-        //             dataLabels: {
-        //                 enabled: show,
-        //                 style: {
-        //                     fontWeight: 'normal'
-        //                 }
-        //             },
-        //             ...(i === 2 ? { colorByPoint: true } : {
-        //                 colorVariation: {
-        //                     key: 'brightness',
-        //                     to: (i % 2 === 0 ? -0.5 : 0.5)
-        //                 }
-        //             })
-        //         });
-        //     }
-
-        //     return levels;
-        // }
+        // SAC Scripting Methods
 
         getSunburstMembers() {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
