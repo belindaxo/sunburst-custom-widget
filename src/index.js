@@ -7,6 +7,8 @@ import { processSeriesData } from './data/dataProcessor.js';
 import { updateTitle, updateSubtitle } from './config/chartUtils.js';
 import { applyHighchartsDefaults, overrideContextButtonSymbol } from './config/highchartsSetup.js';
 import { createChartStylesheet } from './config/styles.js';
+import { scaleValue } from './formatting/scaleFormatter.js';
+import { formatTooltip } from './formatting/tooltipFormatter.js';
 
 (function () {
     class Sunburst extends HTMLElement {
@@ -141,34 +143,9 @@ import { createChartStylesheet } from './config/styles.js';
                 }));
             }
 
-            const scaleFormat = (value) => this._scaleFormat(value);
+            const scaleFormat = (value) => scaleValue(value, this.scaleFormat, this.decimalPlaces);
             const subtitleText = updateSubtitle(this.chartSubtitle, this.scaleFormat);
             const titleText = updateTitle(autoTitle, this.chartTitle);
-
-            // Highcharts.setOptions({
-            //     lang: {
-            //         thousandsSep: ','
-            //     },
-            //     navigation: {
-            //         buttonOptions: {
-            //             symbolStroke: '#004b8d',  // Outline color
-            //             symbolFill: 'transparent', // No fill
-            //             symbolStrokeWidth: 1,
-            //             // Core button shape settings
-            //             height: 32,          // Ensure square for circle
-            //             width: 32,
-            //             theme: {
-            //                 r: 16,           // Rounded corners (half width = full circle)
-            //                 fill: '#f7f7f7', // Background color
-            //                 stroke: '#ccc',  // Thin outer border
-            //                 'stroke-width': 0.8,
-            //                 style: {
-            //                     cursor: 'pointer'
-            //                 }
-            //             }
-            //         }
-            //     }
-            // });
 
             const defaultColors = ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7'];
             const customColors = this.customColors || [];
@@ -191,29 +168,6 @@ import { createChartStylesheet } from './config/styles.js';
             });
 
             console.log('seriesData with colors added:', seriesData);
-
-            // Highcharts.SVGRenderer.prototype.symbols.contextButton = function (x, y, w, h) {
-            //     const radius = w * 0.11;
-            //     const spacing = w * 0.4;
-
-            //     const offsetY = 2;    // moves dots slightly down
-            //     const offsetX = 1;  // moves dots slightly to the right
-
-            //     const centerY = y + h / 2 + offsetY;
-            //     const startX = x + (w - spacing * 2) / 2 + offsetX;
-
-            //     const makeCirclePath = (cx, cy, r) => [
-            //         'M', cx - r, cy,
-            //         'A', r, r, 0, 1, 0, cx + r, cy,
-            //         'A', r, r, 0, 1, 0, cx - r, cy
-            //     ];
-
-            //     return [].concat(
-            //         makeCirclePath(startX, centerY, radius),
-            //         makeCirclePath(startX + spacing, centerY, radius),
-            //         makeCirclePath(startX + spacing * 2, centerY, radius)
-            //     );
-            // };
 
             // Global Configuration
             applyHighchartsDefaults();
@@ -358,7 +312,7 @@ import { createChartStylesheet } from './config/styles.js';
                     followPointer: true,
                     hideDelay: 0,
                     useHTML: true,
-                    formatter: this._formatTooltip(scaleFormat)
+                    formatter: formatTooltip(scaleFormat)
                 },
                 series: [{
                     type: 'sunburst',
@@ -496,113 +450,73 @@ import { createChartStylesheet } from './config/styles.js';
             return levels;
         }
 
-        // /**
-        //  * 
-        //  * @param {string} autoTitle - Automatically generated title based on series and dimensions.
-        //  * @returns {string} The title text.
-        //  */
-        // _updateTitle(autoTitle) {
-        //     if (!this.chartTitle || this.chartTitle.trim() === '') {
-        //         return autoTitle;
-        //     } else {
-        //         return this.chartTitle;
+        // _scaleFormat(value) {
+        //     let scaledValue = value;
+        //     let valueSuffix = '';
+
+        //     switch (this.scaleFormat) {
+        //         case 'k':
+        //             scaledValue = value / 1000;
+        //             valueSuffix = 'k';
+        //             break;
+        //         case 'm':
+        //             scaledValue = value / 1000000;
+        //             valueSuffix = 'm';
+        //             break;
+        //         case 'b':
+        //             scaledValue = value / 1000000000;
+        //             valueSuffix = 'b';
+        //             break;
+        //         default:
+        //             break;
         //     }
+        //     return {
+        //         scaledValue: scaledValue.toFixed(this.decimalPlaces),
+        //         valueSuffix
+        //     };
         // }
 
         // /**
-        //  * Determines subtitle text based on scale format or user input.
-        //  * @returns {string} The subtitle text.
+        //  * Formats the tooltip content for the chart.
+        //  * @param {Function} scaleFormat - A function to scale and format the value.
+        //  * @returns {Function} A function that formats the tooltip content.
         //  */
-        // _updateSubtitle() {
-        //     if (!this.chartSubtitle || this.chartSubtitle.trim() === '') {
-        //         let subtitleText = '';
-        //         switch (this.scaleFormat) {
-        //             case 'k':
-        //                 subtitleText = 'in k';
-        //                 break;
-        //             case 'm':
-        //                 subtitleText = 'in m';
-        //                 break;
-        //             case 'b':
-        //                 subtitleText = 'in b';
-        //                 break;
-        //             default:
-        //                 subtitleText = '';
-        //                 break;
+        // _formatTooltip(scaleFormat) {
+        //     return function () {
+        //         if (this.point) {
+        //             // Retrieve the category data using the index
+        //             const name = this.point.name;
+        //             const description = this.point.description || '';
+        //             const { scaledValue, valueSuffix } = scaleFormat(this.point.value);
+        //             const value = Highcharts.numberFormat(scaledValue, -1, '.', ',');
+        //             const valueWithSuffix = `${value} ${valueSuffix}`;
+        //             if (this.point.id === 'Root') {
+        //                 return `
+        //                 <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
+        //                 <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
+        //                     <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
+        //                 </div>
+        //             `;
+        //             } else {
+        //                 return `
+        //                 <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
+        //                 <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
+        //                     <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
+        //                     <hr style="border: none; border-top: 1px solid #eee; margin: 5px 0;">
+        //                     <table style="width: 100%; font-size: 14px; color: #000000;">
+        //                         <tr>
+        //                             <td style="text-align: left; padding-right: 10px;">${description}</td>
+        //                             <td style="text-align: right; padding-left: 10px;">${name}</td>
+        //                         </tr>
+        //                     </table>
+        //                 </div>
+        //             `;
+        //             }
+        //         } else {
+        //             return 'error with data';
         //         }
-        //         return subtitleText;
-        //     } else {
-        //         return this.chartSubtitle;
-        //     }
+        //     };
         // }
-
-        _scaleFormat(value) {
-            let scaledValue = value;
-            let valueSuffix = '';
-
-            switch (this.scaleFormat) {
-                case 'k':
-                    scaledValue = value / 1000;
-                    valueSuffix = 'k';
-                    break;
-                case 'm':
-                    scaledValue = value / 1000000;
-                    valueSuffix = 'm';
-                    break;
-                case 'b':
-                    scaledValue = value / 1000000000;
-                    valueSuffix = 'b';
-                    break;
-                default:
-                    break;
-            }
-            return {
-                scaledValue: scaledValue.toFixed(this.decimalPlaces),
-                valueSuffix
-            };
-        }
-
-        /**
-         * Formats the tooltip content for the chart.
-         * @param {Function} scaleFormat - A function to scale and format the value.
-         * @returns {Function} A function that formats the tooltip content.
-         */
-        _formatTooltip(scaleFormat) {
-            return function () {
-                if (this.point) {
-                    // Retrieve the category data using the index
-                    const name = this.point.name;
-                    const description = this.point.description || '';
-                    const { scaledValue, valueSuffix } = scaleFormat(this.point.value);
-                    const value = Highcharts.numberFormat(scaledValue, -1, '.', ',');
-                    const valueWithSuffix = `${value} ${valueSuffix}`;
-                    if (this.point.id === 'Root') {
-                        return `
-                        <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
-                        <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
-                            <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
-                        </div>
-                    `;
-                    } else {
-                        return `
-                        <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
-                        <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
-                            <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
-                            <hr style="border: none; border-top: 1px solid #eee; margin: 5px 0;">
-                            <table style="width: 100%; font-size: 14px; color: #000000;">
-                                <tr>
-                                    <td style="text-align: left; padding-right: 10px;">${description}</td>
-                                    <td style="text-align: right; padding-left: 10px;">${name}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    `;
-                    }
-                } else {
-                    return 'error with data';
-                }
-            };
-        }
 
         getSunburstMembers() {
             const dataBinding = this.dataBindings.getDataBinding('dataBinding');
