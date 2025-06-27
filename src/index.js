@@ -245,7 +245,7 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                     const rootLevel = (rootNode?.id === '') ? 1 : (rootNode.level);
                                     console.log('point.events.click - New root level:', rootLevel);
 
-                                    const newLevels = this.generateLevels(rootLevel, totalLevels);
+                                    const newLevels = generateLevels(rootLevel, totalLevels);
                                     series.update({
                                         levels: newLevels
                                     });
