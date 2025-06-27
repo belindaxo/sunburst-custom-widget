@@ -2,28 +2,29 @@ import * as Highcharts from 'highcharts';
 import 'highcharts/modules/sunburst.js';
 import 'highcharts/modules/exporting';
 import 'highcharts/modules/drilldown';
-import 'highcharts/modules/export-data';
+import { parseMetadata } from './data/metadataParser.js';
+import { processSeriesData } from './data/dataProcessor.js';
 
-/**
- * Parses metadata into structured dimensions and measures.
- * @param {Object} metadata - The metadata object from SAC data binding.
- * @returns {Object} An object containing parsed dimensions, measures, and their maps.
- */
-var parseMetadata = metadata => {
-    const { dimensions: dimensionsMap, mainStructureMembers: measuresMap } = metadata;
-    const dimensions = [];
-    for (const key in dimensionsMap) {
-        const dimension = dimensionsMap[key];
-        dimensions.push({ key, ...dimension });
-    }
+// /**
+//  * Parses metadata into structured dimensions and measures.
+//  * @param {Object} metadata - The metadata object from SAC data binding.
+//  * @returns {Object} An object containing parsed dimensions, measures, and their maps.
+//  */
+// var parseMetadata = metadata => {
+//     const { dimensions: dimensionsMap, mainStructureMembers: measuresMap } = metadata;
+//     const dimensions = [];
+//     for (const key in dimensionsMap) {
+//         const dimension = dimensionsMap[key];
+//         dimensions.push({ key, ...dimension });
+//     }
 
-    const measures = [];
-    for (const key in measuresMap) {
-        const measure = measuresMap[key];
-        measures.push({ key, ...measure });
-    }
-    return { dimensions, measures, dimensionsMap, measuresMap };
-}
+//     const measures = [];
+//     for (const key in measuresMap) {
+//         const measure = measuresMap[key];
+//         measures.push({ key, ...measure });
+//     }
+//     return { dimensions, measures, dimensionsMap, measuresMap };
+// }
 
 (function () {
     class Sunburst extends HTMLElement {
@@ -111,55 +112,55 @@ var parseMetadata = metadata => {
             }
         }
 
-        _processSeriesData(data, dimensions, measure) {
-            const seriesData = [];
-            const nodeMap = new Map();
-            let total = 0;
+        // _processSeriesData(data, dimensions, measure) {
+        //     const seriesData = [];
+        //     const nodeMap = new Map();
+        //     let total = 0;
 
-            data.forEach(row => {
-                let parentId = 'Root'; // Start with a root parent ID
-                let pathId = '';
+        //     data.forEach(row => {
+        //         let parentId = 'Root'; // Start with a root parent ID
+        //         let pathId = '';
 
-                dimensions.forEach((dim, level) => {
-                    const value = row[dim.key].label || `Unknown-${level}`;
-                    pathId += (pathId ? '/' : '') + value;
+        //         dimensions.forEach((dim, level) => {
+        //             const value = row[dim.key].label || `Unknown-${level}`;
+        //             pathId += (pathId ? '/' : '') + value;
 
-                    if (!nodeMap.has(pathId)) {
-                        nodeMap.set(pathId, true);
+        //             if (!nodeMap.has(pathId)) {
+        //                 nodeMap.set(pathId, true);
 
-                        const node = {
-                            id: pathId,
-                            parent: parentId,
-                            name: value,
-                            description: dim.description || '',
-                        };
+        //                 const node = {
+        //                     id: pathId,
+        //                     parent: parentId,
+        //                     name: value,
+        //                     description: dim.description || '',
+        //                 };
 
-                        // Assign value only on the leaf level
-                        if (level === dimensions.length - 1) {
-                            const val = row[measure.key].raw ?? 0;
-                            node.value = val;
-                            total += val; // Accumulate total value
-                        }
+        //                 // Assign value only on the leaf level
+        //                 if (level === dimensions.length - 1) {
+        //                     const val = row[measure.key].raw ?? 0;
+        //                     node.value = val;
+        //                     total += val; // Accumulate total value
+        //                 }
 
-                        seriesData.push(node);
-                    }
+        //                 seriesData.push(node);
+        //             }
 
-                    parentId = pathId; // Update parentId for the next level
-                });
-            });
+        //             parentId = pathId; // Update parentId for the next level
+        //         });
+        //     });
 
-            const rootNode = {
-                id: 'Root',
-                parent: '',
-                name: measure.label,
-                description: '',
-                value: total, // Set the total value for the root node
-            };
+        //     const rootNode = {
+        //         id: 'Root',
+        //         parent: '',
+        //         name: measure.label,
+        //         description: '',
+        //         value: total, // Set the total value for the root node
+        //     };
 
-            // Add the root node to the series data
-            seriesData.unshift(rootNode);
-            return seriesData;
-        }
+        //     // Add the root node to the series data
+        //     seriesData.unshift(rootNode);
+        //     return seriesData;
+        // }
 
 
 
@@ -192,8 +193,8 @@ var parseMetadata = metadata => {
             const [dimension] = dimensions;
             const [measure] = measures;
 
-            const seriesData = this._processSeriesData(data, dimensions, measure);
-            console.log('_processSeriesData - seriesData:', seriesData);
+            const seriesData = processSeriesData(data, dimensions, measure);
+            console.log('processSeriesData - seriesData:', seriesData);
 
             const seriesName = measures[0]?.label || 'Value';
 
