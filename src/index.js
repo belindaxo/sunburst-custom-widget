@@ -4,27 +4,9 @@ import 'highcharts/modules/exporting';
 import 'highcharts/modules/drilldown';
 import { parseMetadata } from './data/metadataParser.js';
 import { processSeriesData } from './data/dataProcessor.js';
-
-// /**
-//  * Parses metadata into structured dimensions and measures.
-//  * @param {Object} metadata - The metadata object from SAC data binding.
-//  * @returns {Object} An object containing parsed dimensions, measures, and their maps.
-//  */
-// var parseMetadata = metadata => {
-//     const { dimensions: dimensionsMap, mainStructureMembers: measuresMap } = metadata;
-//     const dimensions = [];
-//     for (const key in dimensionsMap) {
-//         const dimension = dimensionsMap[key];
-//         dimensions.push({ key, ...dimension });
-//     }
-
-//     const measures = [];
-//     for (const key in measuresMap) {
-//         const measure = measuresMap[key];
-//         measures.push({ key, ...measure });
-//     }
-//     return { dimensions, measures, dimensionsMap, measuresMap };
-// }
+import { updateTitle, updateSubtitle } from './config/chartUtils.js';
+import { applyHighchartsDefaults, overrideContextButtonSymbol } from './config/highchartsSetup.js';
+import { createChartStylesheet } from './config/styles.js';
 
 (function () {
     class Sunburst extends HTMLElement {
@@ -32,22 +14,8 @@ import { processSeriesData } from './data/dataProcessor.js';
             super();
             this.attachShadow({ mode: 'open' });
 
-            // Create a CSSStyleSheet for the shadow DOM
-            const sheet = new CSSStyleSheet();
-            sheet.replaceSync(`
-                @font-face {
-                    font-family: '72';
-                    src: url('../fonts/72-Regular.woff2') format('woff2');
-                }
-                #container {
-                    width: 100%;
-                    height: 100%;
-                    font-family: '72';
-                }
-            `);
-
             // Apply the stylesheet to the shadow DOM
-            this.shadowRoot.adoptedStyleSheets = [sheet];
+            this.shadowRoot.adoptedStyleSheets = [createChartStylesheet()];
 
             // Add the container for the chart
             this.shadowRoot.innerHTML = `
@@ -112,58 +80,6 @@ import { processSeriesData } from './data/dataProcessor.js';
             }
         }
 
-        // _processSeriesData(data, dimensions, measure) {
-        //     const seriesData = [];
-        //     const nodeMap = new Map();
-        //     let total = 0;
-
-        //     data.forEach(row => {
-        //         let parentId = 'Root'; // Start with a root parent ID
-        //         let pathId = '';
-
-        //         dimensions.forEach((dim, level) => {
-        //             const value = row[dim.key].label || `Unknown-${level}`;
-        //             pathId += (pathId ? '/' : '') + value;
-
-        //             if (!nodeMap.has(pathId)) {
-        //                 nodeMap.set(pathId, true);
-
-        //                 const node = {
-        //                     id: pathId,
-        //                     parent: parentId,
-        //                     name: value,
-        //                     description: dim.description || '',
-        //                 };
-
-        //                 // Assign value only on the leaf level
-        //                 if (level === dimensions.length - 1) {
-        //                     const val = row[measure.key].raw ?? 0;
-        //                     node.value = val;
-        //                     total += val; // Accumulate total value
-        //                 }
-
-        //                 seriesData.push(node);
-        //             }
-
-        //             parentId = pathId; // Update parentId for the next level
-        //         });
-        //     });
-
-        //     const rootNode = {
-        //         id: 'Root',
-        //         parent: '',
-        //         name: measure.label,
-        //         description: '',
-        //         value: total, // Set the total value for the root node
-        //     };
-
-        //     // Add the root node to the series data
-        //     seriesData.unshift(rootNode);
-        //     return seriesData;
-        // }
-
-
-
         /**
          * Renders the chart using the provided data and metadata.
          */
@@ -226,33 +142,33 @@ import { processSeriesData } from './data/dataProcessor.js';
             }
 
             const scaleFormat = (value) => this._scaleFormat(value);
-            const subtitleText = this._updateSubtitle();
-            const titleText = this._updateTitle(autoTitle);
+            const subtitleText = updateSubtitle(this.chartSubtitle, this.scaleFormat);
+            const titleText = updateTitle(autoTitle, this.chartTitle);
 
-            Highcharts.setOptions({
-                lang: {
-                    thousandsSep: ','
-                },
-                navigation: {
-                    buttonOptions: {
-                        symbolStroke: '#004b8d',  // Outline color
-                        symbolFill: 'transparent', // No fill
-                        symbolStrokeWidth: 1,
-                        // Core button shape settings
-                        height: 32,          // Ensure square for circle
-                        width: 32,
-                        theme: {
-                            r: 16,           // Rounded corners (half width = full circle)
-                            fill: '#f7f7f7', // Background color
-                            stroke: '#ccc',  // Thin outer border
-                            'stroke-width': 0.8,
-                            style: {
-                                cursor: 'pointer'
-                            }
-                        }
-                    }
-                }
-            });
+            // Highcharts.setOptions({
+            //     lang: {
+            //         thousandsSep: ','
+            //     },
+            //     navigation: {
+            //         buttonOptions: {
+            //             symbolStroke: '#004b8d',  // Outline color
+            //             symbolFill: 'transparent', // No fill
+            //             symbolStrokeWidth: 1,
+            //             // Core button shape settings
+            //             height: 32,          // Ensure square for circle
+            //             width: 32,
+            //             theme: {
+            //                 r: 16,           // Rounded corners (half width = full circle)
+            //                 fill: '#f7f7f7', // Background color
+            //                 stroke: '#ccc',  // Thin outer border
+            //                 'stroke-width': 0.8,
+            //                 style: {
+            //                     cursor: 'pointer'
+            //                 }
+            //             }
+            //         }
+            //     }
+            // });
 
             const defaultColors = ['#004b8d', '#939598', '#faa834', '#00aa7e', '#47a5dc', '#006ac7', '#ccced2', '#bf8028', '#00e4a7'];
             const customColors = this.customColors || [];
@@ -276,28 +192,32 @@ import { processSeriesData } from './data/dataProcessor.js';
 
             console.log('seriesData with colors added:', seriesData);
 
-            Highcharts.SVGRenderer.prototype.symbols.contextButton = function (x, y, w, h) {
-                const radius = w * 0.11;
-                const spacing = w * 0.4;
+            // Highcharts.SVGRenderer.prototype.symbols.contextButton = function (x, y, w, h) {
+            //     const radius = w * 0.11;
+            //     const spacing = w * 0.4;
 
-                const offsetY = 2;    // moves dots slightly down
-                const offsetX = 1;  // moves dots slightly to the right
+            //     const offsetY = 2;    // moves dots slightly down
+            //     const offsetX = 1;  // moves dots slightly to the right
 
-                const centerY = y + h / 2 + offsetY;
-                const startX = x + (w - spacing * 2) / 2 + offsetX;
+            //     const centerY = y + h / 2 + offsetY;
+            //     const startX = x + (w - spacing * 2) / 2 + offsetX;
 
-                const makeCirclePath = (cx, cy, r) => [
-                    'M', cx - r, cy,
-                    'A', r, r, 0, 1, 0, cx + r, cy,
-                    'A', r, r, 0, 1, 0, cx - r, cy
-                ];
+            //     const makeCirclePath = (cx, cy, r) => [
+            //         'M', cx - r, cy,
+            //         'A', r, r, 0, 1, 0, cx + r, cy,
+            //         'A', r, r, 0, 1, 0, cx - r, cy
+            //     ];
 
-                return [].concat(
-                    makeCirclePath(startX, centerY, radius),
-                    makeCirclePath(startX + spacing, centerY, radius),
-                    makeCirclePath(startX + spacing * 2, centerY, radius)
-                );
-            };
+            //     return [].concat(
+            //         makeCirclePath(startX, centerY, radius),
+            //         makeCirclePath(startX + spacing, centerY, radius),
+            //         makeCirclePath(startX + spacing * 2, centerY, radius)
+            //     );
+            // };
+
+            // Global Configuration
+            applyHighchartsDefaults();
+            overrideContextButtonSymbol();
 
             const chartOptions = {
                 chart: {
@@ -576,45 +496,45 @@ import { processSeriesData } from './data/dataProcessor.js';
             return levels;
         }
 
-        /**
-         * 
-         * @param {string} autoTitle - Automatically generated title based on series and dimensions.
-         * @returns {string} The title text.
-         */
-        _updateTitle(autoTitle) {
-            if (!this.chartTitle || this.chartTitle.trim() === '') {
-                return autoTitle;
-            } else {
-                return this.chartTitle;
-            }
-        }
+        // /**
+        //  * 
+        //  * @param {string} autoTitle - Automatically generated title based on series and dimensions.
+        //  * @returns {string} The title text.
+        //  */
+        // _updateTitle(autoTitle) {
+        //     if (!this.chartTitle || this.chartTitle.trim() === '') {
+        //         return autoTitle;
+        //     } else {
+        //         return this.chartTitle;
+        //     }
+        // }
 
-        /**
-         * Determines subtitle text based on scale format or user input.
-         * @returns {string} The subtitle text.
-         */
-        _updateSubtitle() {
-            if (!this.chartSubtitle || this.chartSubtitle.trim() === '') {
-                let subtitleText = '';
-                switch (this.scaleFormat) {
-                    case 'k':
-                        subtitleText = 'in k';
-                        break;
-                    case 'm':
-                        subtitleText = 'in m';
-                        break;
-                    case 'b':
-                        subtitleText = 'in b';
-                        break;
-                    default:
-                        subtitleText = '';
-                        break;
-                }
-                return subtitleText;
-            } else {
-                return this.chartSubtitle;
-            }
-        }
+        // /**
+        //  * Determines subtitle text based on scale format or user input.
+        //  * @returns {string} The subtitle text.
+        //  */
+        // _updateSubtitle() {
+        //     if (!this.chartSubtitle || this.chartSubtitle.trim() === '') {
+        //         let subtitleText = '';
+        //         switch (this.scaleFormat) {
+        //             case 'k':
+        //                 subtitleText = 'in k';
+        //                 break;
+        //             case 'm':
+        //                 subtitleText = 'in m';
+        //                 break;
+        //             case 'b':
+        //                 subtitleText = 'in b';
+        //                 break;
+        //             default:
+        //                 subtitleText = '';
+        //                 break;
+        //         }
+        //         return subtitleText;
+        //     } else {
+        //         return this.chartSubtitle;
+        //     }
+        // }
 
         _scaleFormat(value) {
             let scaledValue = value;
