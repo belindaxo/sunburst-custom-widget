@@ -4,7 +4,7 @@ import 'highcharts/modules/exporting';
 import 'highcharts/modules/drilldown';
 import { parseMetadata } from './data/metadataParser.js';
 import { processSeriesData } from './data/dataProcessor.js';
-import { updateTitle, updateSubtitle } from './config/chartUtils.js';
+import { updateTitle, updateSubtitle, generateLevels } from './config/chartUtils.js';
 import { applyHighchartsDefaults, overrideContextButtonSymbol } from './config/highchartsSetup.js';
 import { createChartStylesheet } from './config/styles.js';
 import { scaleValue } from './formatting/scaleFormatter.js';
@@ -127,8 +127,8 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
 
             const totalLevels = dimensions.length + 1;
 
-            const levels = this._generateLevels(1, totalLevels);
-            console.log('_generateLevels - Levels:', levels);
+            const levels = generateLevels(1, totalLevels);
+            console.log('generateLevels - Levels:', levels);
 
             const validCategoryNames = seriesData.filter(node => node.parent === 'Root').map(node => node.name) || [];
             console.log('validCategoryNames: ', validCategoryNames);
@@ -245,7 +245,7 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                     const rootLevel = (rootNode?.id === '') ? 1 : (rootNode.level);
                                     console.log('point.events.click - New root level:', rootLevel);
 
-                                    const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                    const newLevels = this.generateLevels(rootLevel, totalLevels);
                                     series.update({
                                         levels: newLevels
                                     });
@@ -331,7 +331,7 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                 console.log('Breadcrumbs - breadcrumbs.level:', newLevel);
                                 const rootLevel = (newLevel === 0) ? 1 : newLevel;
                                 console.log('Breadcrumbs - New root level:', rootLevel);
-                                const newLevels = this._generateLevels(rootLevel, totalLevels);
+                                const newLevels = generateLevels(rootLevel, totalLevels);
                                 console.log('Breadcrumbs - New levels:', newLevels);
                                 series.update({
                                     levels: newLevels
@@ -412,110 +412,42 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
             });
         }
 
-        _generateLevels(rootLevel, totalLevels) {
-            const levels = [];
+        // _generateLevels(rootLevel, totalLevels) {
+        //     const levels = [];
 
-            // Add Root Node level
-            levels.push({
-                level: 1,
-                dataLabels: {
-                    enabled: false
-                }
-            });
-
-            // Add real data levels, starting from 2
-            for (let i = 2; i <= totalLevels; i++) {
-                const show = i >= rootLevel && i <= rootLevel + 2;
-
-                levels.push({
-                    level: i,
-                    levelSize: {
-                        value: show ? 1 : 0
-                    },
-                    dataLabels: {
-                        enabled: show,
-                        style: {
-                            fontWeight: 'normal'
-                        }
-                    },
-                    ...(i === 2 ? { colorByPoint: true } : {
-                        colorVariation: {
-                            key: 'brightness',
-                            to: (i % 2 === 0 ? -0.5 : 0.5)
-                        }
-                    })
-                });
-            }
-
-            return levels;
-        }
-
-        // _scaleFormat(value) {
-        //     let scaledValue = value;
-        //     let valueSuffix = '';
-
-        //     switch (this.scaleFormat) {
-        //         case 'k':
-        //             scaledValue = value / 1000;
-        //             valueSuffix = 'k';
-        //             break;
-        //         case 'm':
-        //             scaledValue = value / 1000000;
-        //             valueSuffix = 'm';
-        //             break;
-        //         case 'b':
-        //             scaledValue = value / 1000000000;
-        //             valueSuffix = 'b';
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        //     return {
-        //         scaledValue: scaledValue.toFixed(this.decimalPlaces),
-        //         valueSuffix
-        //     };
-        // }
-
-        // /**
-        //  * Formats the tooltip content for the chart.
-        //  * @param {Function} scaleFormat - A function to scale and format the value.
-        //  * @returns {Function} A function that formats the tooltip content.
-        //  */
-        // _formatTooltip(scaleFormat) {
-        //     return function () {
-        //         if (this.point) {
-        //             // Retrieve the category data using the index
-        //             const name = this.point.name;
-        //             const description = this.point.description || '';
-        //             const { scaledValue, valueSuffix } = scaleFormat(this.point.value);
-        //             const value = Highcharts.numberFormat(scaledValue, -1, '.', ',');
-        //             const valueWithSuffix = `${value} ${valueSuffix}`;
-        //             if (this.point.id === 'Root') {
-        //                 return `
-        //                 <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
-        //                 <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
-        //                     <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
-        //                 </div>
-        //             `;
-        //             } else {
-        //                 return `
-        //                 <div style="text-align: left; font-family: '72', sans-serif; font-size: 14px;">
-        //                 <div style="font-size: 14px; font-weight: normal; color: #666666;">${this.series.name}</div>
-        //                     <div style="font-size: 18px; font-weight: normal; color: #000000;">${valueWithSuffix}</div>
-        //                     <hr style="border: none; border-top: 1px solid #eee; margin: 5px 0;">
-        //                     <table style="width: 100%; font-size: 14px; color: #000000;">
-        //                         <tr>
-        //                             <td style="text-align: left; padding-right: 10px;">${description}</td>
-        //                             <td style="text-align: right; padding-left: 10px;">${name}</td>
-        //                         </tr>
-        //                     </table>
-        //                 </div>
-        //             `;
-        //             }
-        //         } else {
-        //             return 'error with data';
+        //     // Add Root Node level
+        //     levels.push({
+        //         level: 1,
+        //         dataLabels: {
+        //             enabled: false
         //         }
-        //     };
+        //     });
+
+        //     // Add real data levels, starting from 2
+        //     for (let i = 2; i <= totalLevels; i++) {
+        //         const show = i >= rootLevel && i <= rootLevel + 2;
+
+        //         levels.push({
+        //             level: i,
+        //             levelSize: {
+        //                 value: show ? 1 : 0
+        //             },
+        //             dataLabels: {
+        //                 enabled: show,
+        //                 style: {
+        //                     fontWeight: 'normal'
+        //                 }
+        //             },
+        //             ...(i === 2 ? { colorByPoint: true } : {
+        //                 colorVariation: {
+        //                     key: 'brightness',
+        //                     to: (i % 2 === 0 ? -0.5 : 0.5)
+        //                 }
+        //             })
+        //         });
+        //     }
+
+        //     return levels;
         // }
 
         getSunburstMembers() {

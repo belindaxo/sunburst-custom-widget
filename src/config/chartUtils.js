@@ -40,3 +40,41 @@ export function updateTitle(autoTitle, chartTitle) {
         return chartTitle;
     }
 }
+
+export function generateLevels(rootLevel, totalLevels) {
+    const levels = [];
+
+    // Add Root Node level
+    levels.push({
+        level: 1,
+        dataLabels: {
+            enabled: false
+        }
+    });
+
+    // Add real data levels, starting from 2
+    for (let i = 2; i <= totalLevels; i++) {
+        const show = i >= rootLevel && i <= rootLevel + 2;
+
+        levels.push({
+            level: i,
+            levelSize: {
+                value: show ? 1 : 0
+            },
+            dataLabels: {
+                enabled: show,
+                style: {
+                    fontWeight: 'normal'
+                }
+            },
+            ...(i === 2 ? { colorByPoint: true } : {
+                colorVariation: {
+                    key: 'brightness',
+                    to: (i % 2 === 0 ? -0.5 : 0.5)
+                }
+            })
+        });
+    }
+
+    return levels;
+}
