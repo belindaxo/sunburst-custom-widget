@@ -30,7 +30,8 @@ export function processSeriesData(data, dimensions, measure) {
 
                 // Assign value only on the leaf level
                 if (level === dimensions.length - 1) {
-                    const val = row[measure.key].raw ?? 0;
+                    const rawVal = row[measure.key]?.raw;
+                    const val = (typeof rawVal === 'number' && isFinite(rawVal)) ? rawVal : 0;
                     node.value = val;
                     total += val; // Accumulate total value
                 }
