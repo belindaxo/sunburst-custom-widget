@@ -93,6 +93,11 @@
             "description": "The number of decimal places to display",
             "default": 2
         },
+        "topN": {
+            
+            "type": "integer",
+            "description": "The number of top members to display"
+        },
         "customColors": {
             "type": "CustomColor[]",
             "description": "List of category-color mappings",

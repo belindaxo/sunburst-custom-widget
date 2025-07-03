@@ -64,7 +64,7 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
             return [
                 'chartTitle', 'titleSize', 'titleFontStyle', 'titleAlignment', 'titleColor',                // Title properties
                 'chartSubtitle', 'subtitleSize', 'subtitleFontStyle', 'subtitleAlignment', 'subtitleColor', // Subtitle properties
-                'scaleFormat', 'decimalPlaces',                                                             // Number formatting properties
+                'scaleFormat', 'decimalPlaces', 'topN',                                                             // Number formatting properties
                 'customColors'
             ];
         }
@@ -168,6 +168,25 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
             });
 
             console.log('seriesData with colors added:', seriesData);
+
+            const leafTotals = new Map();
+            seriesData.forEach(node => {
+                if (node.id !== 'Root' && node.value) {
+                    leafTotals.set(node.id, node.value);
+                }
+            });
+            console.log('Leaf totals map:', leafTotals);
+
+            const topN = parseInt(this.topN);
+            if (!isNaN(topN) && topN > 0) {
+                const sortedNodes = Array.from(leafTotals.entries()).sort((a, b) => b[1] - a[1]).slice(0, topN).map(entry => entry[0]);
+                console.log('sortedNodes:', sortedNodes);
+
+                seriesData = sortedNodes;
+            }
+
+    
+
 
             // Global Configuration
             applyHighchartsDefaults();
