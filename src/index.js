@@ -260,15 +260,13 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                         clickedPoint.select(true, false);
                                         this._selectedPoint = clickedPoint;
 
-                                        const labels = clickedPoint.id.split('/');
+                                        const labels = clickedPoint.id.split('|');
                                         const selection = {};
                                         labels.forEach((label, index) => {
                                             const dim = dimensions[index];
-                                            if (dim && dim.key) { // Ensure dim and dim.key are defined
-                                                const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                                if (matchingRow) {
-                                                    selection[dim.id] = matchingRow[dim.key].id;
-                                                }
+                                            const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                            if (dim && matchingRow) {
+                                                selection[dim.id] = matchingRow[dim.key].id;
                                             }
                                         });
 
@@ -283,15 +281,13 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                         return;
                                     }
 
-                                    const labels = rootId.split('/');
+                                    const labels = rootId.split('|');
                                     const selection = {};
                                     labels.forEach((label, index) => {
                                         const dim = dimensions[index];
-                                        if (dim && dim.key) { // Ensure dim and dim.key are defined
-                                            const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                            if (matchingRow) {
-                                                selection[dim.id] = matchingRow[dim.key].id;
-                                            }
+                                        const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                        if (dim && matchingRow) {
+                                            selection[dim.id] = matchingRow[dim.key].id;
                                         }
                                     });
                                     console.log('point.events.click - Selection:', selection);
@@ -345,16 +341,14 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                 // Remove existing filters before applying new ones
                                 linkedAnalysis.removeFilters();
 
-                                const labels = rootId.split('/');
+                                const labels = rootId.split('|');
                                 console.log('Breadcrumbs - Labels:', labels);
                                 const selection = {};
                                 labels.forEach((label, index) => {
                                     const dim = dimensions[index];
-                                    if (dim && dim.key) { // Ensure dim and dim.key are defined
-                                        const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                        if (matchingRow) {
-                                            selection[dim.id] = matchingRow[dim.key].id;
-                                        }
+                                    const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                    if (dim && matchingRow) {
+                                        selection[dim.id] = matchingRow[dim.key].id;
                                     }
                                 });
                                 console.log('Breadcrumbs - Selection:', selection);

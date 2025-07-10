@@ -16,7 +16,7 @@ export function processSeriesData(data, dimensions, measure) {
 
         dimensions.forEach((dim, level) => {
             const value = row[dim.key].label || `Unknown-${level}`;
-            pathId += (pathId ? '/' : '') + value;
+            pathId += (pathId ? '|' : '') + value;
 
             if (!nodeMap.has(pathId)) {
                 nodeMap.set(pathId, true);
