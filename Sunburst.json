@@ -14,14 +14,14 @@
             "tag": "com-sap-sample-sunburst",
             "url": "https://belindaxo.github.io/sunburst-custom-widget/dist/bundle.js",
             "integrity": "sha256-04sM+xuFvZl/ahuLTpjiKTLsnYoZDxzfzWQaEABm9mk=",
-            "ignoreIntegrity": false
+            "ignoreIntegrity": true
         },
         {
             "kind": "styling",
             "tag": "com-sap-sample-sunburst-aps",
             "url": "https://belindaxo.github.io/sunburst-custom-widget/dist/bundle.js",
             "integrity": "sha256-04sM+xuFvZl/ahuLTpjiKTLsnYoZDxzfzWQaEABm9mk=",
-            "ignoreIntegrity": false
+            "ignoreIntegrity": true
         }
     ],
     "properties": {

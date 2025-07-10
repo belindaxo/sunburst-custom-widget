@@ -264,9 +264,11 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                         const selection = {};
                                         labels.forEach((label, index) => {
                                             const dim = dimensions[index];
-                                            const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                            if (dim && matchingRow) {
-                                                selection[dim.id] = matchingRow[dim.key].id;
+                                            if (dim && dim.key) { // Ensure dim and dim.key are defined
+                                                const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                                if (matchingRow) {
+                                                    selection[dim.id] = matchingRow[dim.key].id;
+                                                }
                                             }
                                         });
 
@@ -285,9 +287,11 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                     const selection = {};
                                     labels.forEach((label, index) => {
                                         const dim = dimensions[index];
-                                        const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                        if (dim && matchingRow) {
-                                            selection[dim.id] = matchingRow[dim.key].id;
+                                        if (dim && dim.key) { // Ensure dim and dim.key are defined
+                                            const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                            if (matchingRow) {
+                                                selection[dim.id] = matchingRow[dim.key].id;
+                                            }
                                         }
                                     });
                                     console.log('point.events.click - Selection:', selection);
@@ -346,9 +350,11 @@ import { formatTooltip } from './formatting/tooltipFormatter.js';
                                 const selection = {};
                                 labels.forEach((label, index) => {
                                     const dim = dimensions[index];
-                                    const matchingRow = data.find((item) => item[dim.key]?.label === label);
-                                    if (dim && matchingRow) {
-                                        selection[dim.id] = matchingRow[dim.key].id;
+                                    if (dim && dim.key) { // Ensure dim and dim.key are defined
+                                        const matchingRow = data.find((item) => item[dim.key]?.label === label);
+                                        if (matchingRow) {
+                                            selection[dim.id] = matchingRow[dim.key].id;
+                                        }
                                     }
                                 });
                                 console.log('Breadcrumbs - Selection:', selection);
