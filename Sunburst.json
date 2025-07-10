@@ -13,15 +13,15 @@
             "kind": "main",
             "tag": "com-sap-sample-sunburst",
             "url": "https://belindaxo.github.io/sunburst-custom-widget/dist/bundle.js",
-            "integrity": "sha256-04sM+xuFvZl/ahuLTpjiKTLsnYoZDxzfzWQaEABm9mk=",
-            "ignoreIntegrity": true
+            "integrity": "sha256-GzKtrGrrIwh8nwoe/y4Xo8PqROmebBaRQ1IAmrp4z4o=",
+            "ignoreIntegrity": false
         },
         {
             "kind": "styling",
             "tag": "com-sap-sample-sunburst-aps",
             "url": "https://belindaxo.github.io/sunburst-custom-widget/dist/bundle.js",
-            "integrity": "sha256-04sM+xuFvZl/ahuLTpjiKTLsnYoZDxzfzWQaEABm9mk=",
-            "ignoreIntegrity": true
+            "integrity": "sha256-GzKtrGrrIwh8nwoe/y4Xo8PqROmebBaRQ1IAmrp4z4o=",
+            "ignoreIntegrity": false
         }
     ],
     "properties": {
